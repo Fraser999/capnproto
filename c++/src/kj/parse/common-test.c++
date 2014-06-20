@@ -34,7 +34,7 @@ typedef IteratorInput<char, const char*> Input;
 TEST(CommonParsers, AnyParser) {
   StringPtr text = "foo";
   Input input(text.begin(), text.end());
-  constexpr auto parser = any;
+  KJ_CONSTEXPR auto parser = any;
 
   Maybe<char> result = parser(input);
   KJ_IF_MAYBE(c, result) {

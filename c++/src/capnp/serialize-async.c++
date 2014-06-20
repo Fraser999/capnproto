@@ -33,7 +33,7 @@ public:
   inline AsyncMessageReader(ReaderOptions options): MessageReader(options) {
     memset(firstWord, 0, sizeof(firstWord));
   }
-  ~AsyncMessageReader() noexcept(false) {}
+  ~AsyncMessageReader() KJ_NOEXCEPT_FALSE {}
 
   kj::Promise<bool> read(kj::AsyncInputStream& inputStream, kj::ArrayPtr<word> scratchSpace);
 

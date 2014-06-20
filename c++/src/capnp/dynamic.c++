@@ -1422,7 +1422,7 @@ DynamicValue::Reader::Reader(const Reader& other) {
 
   memcpy(this, &other, sizeof(*this));
 }
-DynamicValue::Reader::Reader(Reader&& other) noexcept {
+DynamicValue::Reader::Reader(Reader&& other) KJ_NOEXCEPT {
   switch (other.type) {
     case UNKNOWN:
     case VOID:
@@ -1453,7 +1453,7 @@ DynamicValue::Reader::Reader(Reader&& other) noexcept {
 
   memcpy(this, &other, sizeof(*this));
 }
-DynamicValue::Reader::~Reader() noexcept(false) {
+DynamicValue::Reader::~Reader() KJ_NOEXCEPT_FALSE {
   if (type == CAPABILITY) {
     kj::dtor(capabilityValue);
   }
@@ -1508,7 +1508,7 @@ DynamicValue::Builder::Builder(Builder& other) {
 
   memcpy(this, &other, sizeof(*this));
 }
-DynamicValue::Builder::Builder(Builder&& other) noexcept {
+DynamicValue::Builder::Builder(Builder&& other) KJ_NOEXCEPT {
   switch (other.type) {
     case UNKNOWN:
     case VOID:
@@ -1542,7 +1542,7 @@ DynamicValue::Builder::Builder(Builder&& other) noexcept {
 
   memcpy(this, &other, sizeof(*this));
 }
-DynamicValue::Builder::~Builder() noexcept(false) {
+DynamicValue::Builder::~Builder() KJ_NOEXCEPT_FALSE {
   if (type == CAPABILITY) {
     kj::dtor(capabilityValue);
   }
@@ -1583,7 +1583,7 @@ DynamicValue::Reader DynamicValue::Builder::asReader() const {
   return Reader();
 }
 
-DynamicValue::Pipeline::Pipeline(Pipeline&& other) noexcept: type(other.type) {
+DynamicValue::Pipeline::Pipeline(Pipeline&& other) KJ_NOEXCEPT: type(other.type) {
   switch (type) {
     case UNKNOWN: break;
     case STRUCT: kj::ctor(structValue, kj::mv(other.structValue)); break;
@@ -1599,7 +1599,7 @@ DynamicValue::Pipeline& DynamicValue::Pipeline::operator=(Pipeline&& other) {
   kj::ctor(*this, kj::mv(other));
   return *this;
 }
-DynamicValue::Pipeline::~Pipeline() noexcept(false) {
+DynamicValue::Pipeline::~Pipeline() KJ_NOEXCEPT_FALSE {
   switch (type) {
     case UNKNOWN: break;
     case STRUCT: kj::dtor(structValue); break;

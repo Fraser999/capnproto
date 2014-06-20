@@ -77,7 +77,7 @@ public:
         destroyElement(destroyElement) {}
   KJ_DISALLOW_COPY(ExceptionSafeArrayUtil);
 
-  inline ~ExceptionSafeArrayUtil() noexcept(false) {
+  inline ~ExceptionSafeArrayUtil() KJ_NOEXCEPT_FALSE {
     if (constructedElementCount > 0) destroyAll();
   }
 
@@ -131,12 +131,12 @@ class Array {
 public:
   inline Array(): ptr(nullptr), size_(0), disposer(nullptr) {}
   inline Array(decltype(nullptr)): ptr(nullptr), size_(0), disposer(nullptr) {}
-  inline Array(Array&& other) noexcept
+  inline Array(Array&& other) KJ_NOEXCEPT
       : ptr(other.ptr), size_(other.size_), disposer(other.disposer) {
     other.ptr = nullptr;
     other.size_ = 0;
   }
-  inline Array(Array<RemoveConstOrDisable<T>>&& other) noexcept
+  inline Array(Array<RemoveConstOrDisable<T>>&& other) KJ_NOEXCEPT
       : ptr(other.ptr), size_(other.size_), disposer(other.disposer) {
     other.ptr = nullptr;
     other.size_ = 0;
@@ -145,7 +145,7 @@ public:
       : ptr(firstElement), size_(size), disposer(&disposer) {}
 
   KJ_DISALLOW_COPY(Array);
-  inline ~Array() noexcept { dispose(); }
+  inline ~Array() KJ_NOEXCEPT { dispose(); }
 
   inline operator ArrayPtr<T>() {
     return ArrayPtr<T>(ptr, size_);
@@ -292,7 +292,7 @@ public:
     other.endPtr = nullptr;
   }
   KJ_DISALLOW_COPY(ArrayBuilder);
-  inline ~ArrayBuilder() noexcept(false) { dispose(); }
+  inline ~ArrayBuilder() KJ_NOEXCEPT_FALSE { dispose(); }
 
   inline operator ArrayPtr<T>() {
     return arrayPtr(ptr, pos);
@@ -444,8 +444,8 @@ class CappedArray {
   // TODO(someday):  Don't construct elements past currentSize?
 
 public:
-  inline constexpr CappedArray(): currentSize(fixedSize) {}
-  inline explicit constexpr CappedArray(size_t s): currentSize(s) {}
+  inline KJ_CONSTEXPR CappedArray(): currentSize(fixedSize) {}
+  inline explicit KJ_CONSTEXPR CappedArray(size_t s): currentSize(s) {}
 
   inline size_t size() const { return currentSize; }
   inline void setSize(size_t s) { KJ_IREQUIRE(s <= fixedSize); currentSize = s; }
@@ -575,7 +575,7 @@ struct CopyConstructArray_;
 
 template <typename T>
 struct CopyConstructArray_<T, T*, true> {
-  static inline T* apply(T* __restrict__ pos, T* start, T* end) {
+  static inline T* apply(T* __restrict pos, T* start, T* end) {
     memcpy(pos, start, reinterpret_cast<byte*>(end) - reinterpret_cast<byte*>(start));
     return pos + (end - start);
   }
@@ -583,7 +583,7 @@ struct CopyConstructArray_<T, T*, true> {
 
 template <typename T>
 struct CopyConstructArray_<T, const T*, true> {
-  static inline T* apply(T* __restrict__ pos, const T* start, const T* end) {
+  static inline T* apply(T* __restrict pos, const T* start, const T* end) {
     memcpy(pos, start, reinterpret_cast<const byte*>(end) - reinterpret_cast<const byte*>(start));
     return pos + (end - start);
   }
@@ -591,7 +591,7 @@ struct CopyConstructArray_<T, const T*, true> {
 
 template <typename T, typename Iterator>
 struct CopyConstructArray_<T, Iterator, true> {
-  static inline T* apply(T* __restrict__ pos, Iterator start, Iterator end) {
+  static inline T* apply(T* __restrict pos, Iterator start, Iterator end) {
     // Since both the copy constructor and assignment operator are trivial, we know that assignment
     // is equivalent to copy-constructing.  So we can make this case somewhat easier for the
     // compiler to optimize.
@@ -608,29 +608,30 @@ struct CopyConstructArray_<T, Iterator, false> {
     T* start;
     T* pos;
     inline explicit ExceptionGuard(T* pos): start(pos), pos(pos) {}
-    ~ExceptionGuard() noexcept(false) {
+    ~ExceptionGuard() KJ_NOEXCEPT_FALSE {
       while (pos > start) {
         dtor(*--pos);
       }
     }
   };
 
-  static T* apply(T* __restrict__ pos, Iterator start, Iterator end) {
+  static T* apply(T* __restrict pos, Iterator start, Iterator end) {
+#ifndef _MSC_VER
     if (noexcept(T(instance<const T&>()))) {
       while (start != end) {
         ctor(*pos++, implicitCast<const T&>(*start++));
       }
       return pos;
-    } else {
-      // Crap.  This is complicated.
-      ExceptionGuard guard(pos);
-      while (start != end) {
-        ctor(*guard.pos, implicitCast<const T&>(*start++));
-        ++guard.pos;
-      }
-      guard.start = guard.pos;
-      return guard.pos;
     }
+#endif
+    // Crap.  This is complicated.
+    ExceptionGuard guard(pos);
+    while (start != end) {
+      ctor(*guard.pos, implicitCast<const T&>(*start++));
+      ++guard.pos;
+    }
+    guard.start = guard.pos;
+    return guard.pos;
   }
 };
 

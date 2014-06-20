@@ -1424,7 +1424,7 @@ void SchemaLoader::InitializerImpl::init(const _::RawSchema* schema) const {
 SchemaLoader::SchemaLoader(): impl(kj::heap<Impl>(*this)) {}
 SchemaLoader::SchemaLoader(const LazyLoadCallback& callback)
     : impl(kj::heap<Impl>(*this, callback)) {}
-SchemaLoader::~SchemaLoader() noexcept(false) {}
+SchemaLoader::~SchemaLoader() KJ_NOEXCEPT_FALSE {}
 
 Schema SchemaLoader::get(uint64_t id) const {
   KJ_IF_MAYBE(result, tryGet(id)) {

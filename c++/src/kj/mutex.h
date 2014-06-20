@@ -73,9 +73,9 @@ private:
   //   waiting for a read lock, otherwise it is the count of threads that currently hold a read
   //   lock.
 
-  static constexpr uint EXCLUSIVE_HELD = 1u << 31;
-  static constexpr uint EXCLUSIVE_REQUESTED = 1u << 30;
-  static constexpr uint SHARED_COUNT_MASK = EXCLUSIVE_REQUESTED - 1;
+  static KJ_CONSTEXPR uint EXCLUSIVE_HELD = 1u << 31;
+  static KJ_CONSTEXPR uint EXCLUSIVE_REQUESTED = 1u << 30;
+  static KJ_CONSTEXPR uint SHARED_COUNT_MASK = EXCLUSIVE_REQUESTED - 1;
 
 #else
   mutable pthread_rwlock_t mutex;
@@ -102,7 +102,7 @@ public:
 
   void runOnce(Initializer& init);
 
-  inline bool isInitialized() noexcept {
+  inline bool isInitialized() KJ_NOEXCEPT {
     // Fast path check to see if runOnce() would simply return immediately.
 #if KJ_USE_FUTEX
     return __atomic_load_n(&futex, __ATOMIC_ACQUIRE) == INITIALIZED;
@@ -116,11 +116,11 @@ public:
   // not already initialized, or when runOnce() or isInitialized() might be called concurrently in
   // another thread.
 
-  void disable() noexcept;
+  void disable() KJ_NOEXCEPT;
   // Prevent future calls to runOnce() and reset() from having any effect, and make isInitialized()
   // return false forever.  If an initializer is currently running, block until it completes.
 
-  bool isDisabled() noexcept {
+  bool isDisabled() KJ_NOEXCEPT {
     // Returns true if `disable()` has been called.
 
 #if KJ_USE_FUTEX

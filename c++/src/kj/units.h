@@ -51,32 +51,32 @@ struct Id {
 
   UnderlyingType value;
 
-  inline constexpr Id(): value(0) {}
-  inline constexpr explicit Id(int value): value(value) {}
+  inline KJ_CONSTEXPR Id(): value(0) {}
+  inline KJ_CONSTEXPR explicit Id(int value): value(value) {}
 
-  inline constexpr bool operator==(const Id& other) const { return value == other.value; }
-  inline constexpr bool operator!=(const Id& other) const { return value != other.value; }
-  inline constexpr bool operator<=(const Id& other) const { return value <= other.value; }
-  inline constexpr bool operator>=(const Id& other) const { return value >= other.value; }
-  inline constexpr bool operator< (const Id& other) const { return value <  other.value; }
-  inline constexpr bool operator> (const Id& other) const { return value >  other.value; }
+  inline KJ_CONSTEXPR bool operator==(const Id& other) const { return value == other.value; }
+  inline KJ_CONSTEXPR bool operator!=(const Id& other) const { return value != other.value; }
+  inline KJ_CONSTEXPR bool operator<=(const Id& other) const { return value <= other.value; }
+  inline KJ_CONSTEXPR bool operator>=(const Id& other) const { return value >= other.value; }
+  inline KJ_CONSTEXPR bool operator< (const Id& other) const { return value <  other.value; }
+  inline KJ_CONSTEXPR bool operator> (const Id& other) const { return value >  other.value; }
 };
 
 // =======================================================================================
 // Quantity and UnitRatio -- implement unit analysis via the type system
 
-template <typename T> constexpr bool isIntegral() { return false; }
-template <> constexpr bool isIntegral<char>() { return true; }
-template <> constexpr bool isIntegral<signed char>() { return true; }
-template <> constexpr bool isIntegral<short>() { return true; }
-template <> constexpr bool isIntegral<int>() { return true; }
-template <> constexpr bool isIntegral<long>() { return true; }
-template <> constexpr bool isIntegral<long long>() { return true; }
-template <> constexpr bool isIntegral<unsigned char>() { return true; }
-template <> constexpr bool isIntegral<unsigned short>() { return true; }
-template <> constexpr bool isIntegral<unsigned int>() { return true; }
-template <> constexpr bool isIntegral<unsigned long>() { return true; }
-template <> constexpr bool isIntegral<unsigned long long>() { return true; }
+template <typename T> KJ_CONSTEXPR bool isIntegral() { return false; }
+template <> KJ_CONSTEXPR bool isIntegral<char>() { return true; }
+template <> KJ_CONSTEXPR bool isIntegral<signed char>() { return true; }
+template <> KJ_CONSTEXPR bool isIntegral<short>() { return true; }
+template <> KJ_CONSTEXPR bool isIntegral<int>() { return true; }
+template <> KJ_CONSTEXPR bool isIntegral<long>() { return true; }
+template <> KJ_CONSTEXPR bool isIntegral<long long>() { return true; }
+template <> KJ_CONSTEXPR bool isIntegral<unsigned char>() { return true; }
+template <> KJ_CONSTEXPR bool isIntegral<unsigned short>() { return true; }
+template <> KJ_CONSTEXPR bool isIntegral<unsigned int>() { return true; }
+template <> KJ_CONSTEXPR bool isIntegral<unsigned long>() { return true; }
+template <> KJ_CONSTEXPR bool isIntegral<unsigned long long>() { return true; }
 
 template <typename Number, typename Unit1, typename Unit2>
 class UnitRatio {
@@ -91,36 +91,36 @@ class UnitRatio {
 public:
   inline UnitRatio() {}
 
-  constexpr explicit UnitRatio(Number unit1PerUnit2): unit1PerUnit2(unit1PerUnit2) {}
+  KJ_CONSTEXPR explicit UnitRatio(Number unit1PerUnit2): unit1PerUnit2(unit1PerUnit2) {}
   // This constructor was intended to be private, but GCC complains about it being private in a
   // bunch of places that don't appear to even call it, so I made it public.  Oh well.
 
   template <typename OtherNumber>
-  inline constexpr UnitRatio(const UnitRatio<OtherNumber, Unit1, Unit2>& other)
+  inline KJ_CONSTEXPR UnitRatio(const UnitRatio<OtherNumber, Unit1, Unit2>& other)
       : unit1PerUnit2(other.unit1PerUnit2) {}
 
   template <typename OtherNumber>
-  inline constexpr UnitRatio<decltype(Number(1)+OtherNumber(1)), Unit1, Unit2>
+  inline KJ_CONSTEXPR UnitRatio<decltype(Number(1)+OtherNumber(1)), Unit1, Unit2>
       operator+(UnitRatio<OtherNumber, Unit1, Unit2> other) const {
     return UnitRatio<decltype(Number(1)+OtherNumber(1)), Unit1, Unit2>(
         unit1PerUnit2 + other.unit1PerUnit2);
   }
   template <typename OtherNumber>
-  inline constexpr UnitRatio<decltype(Number(1)-OtherNumber(1)), Unit1, Unit2>
+  inline KJ_CONSTEXPR UnitRatio<decltype(Number(1)-OtherNumber(1)), Unit1, Unit2>
       operator-(UnitRatio<OtherNumber, Unit1, Unit2> other) const {
     return UnitRatio<decltype(Number(1)-OtherNumber(1)), Unit1, Unit2>(
         unit1PerUnit2 - other.unit1PerUnit2);
   }
 
   template <typename OtherNumber, typename Unit3>
-  inline constexpr UnitRatio<decltype(Number(1)*OtherNumber(1)), Unit3, Unit2>
+  inline KJ_CONSTEXPR UnitRatio<decltype(Number(1)*OtherNumber(1)), Unit3, Unit2>
       operator*(UnitRatio<OtherNumber, Unit3, Unit1> other) const {
     // U1 / U2 * U3 / U1 = U3 / U2
     return UnitRatio<decltype(Number(1)*OtherNumber(1)), Unit3, Unit2>(
         unit1PerUnit2 * other.unit1PerUnit2);
   }
   template <typename OtherNumber, typename Unit3>
-  inline constexpr UnitRatio<decltype(Number(1)*OtherNumber(1)), Unit1, Unit3>
+  inline KJ_CONSTEXPR UnitRatio<decltype(Number(1)*OtherNumber(1)), Unit1, Unit3>
       operator*(UnitRatio<OtherNumber, Unit2, Unit3> other) const {
     // U1 / U2 * U2 / U3 = U1 / U3
     return UnitRatio<decltype(Number(1)*OtherNumber(1)), Unit1, Unit3>(
@@ -128,14 +128,14 @@ public:
   }
 
   template <typename OtherNumber, typename Unit3>
-  inline constexpr UnitRatio<decltype(Number(1)*OtherNumber(1)), Unit3, Unit2>
+  inline KJ_CONSTEXPR UnitRatio<decltype(Number(1)*OtherNumber(1)), Unit3, Unit2>
       operator/(UnitRatio<OtherNumber, Unit1, Unit3> other) const {
     // (U1 / U2) / (U1 / U3) = U3 / U2
     return UnitRatio<decltype(Number(1)*OtherNumber(1)), Unit3, Unit2>(
         unit1PerUnit2 / other.unit1PerUnit2);
   }
   template <typename OtherNumber, typename Unit3>
-  inline constexpr UnitRatio<decltype(Number(1)*OtherNumber(1)), Unit1, Unit3>
+  inline KJ_CONSTEXPR UnitRatio<decltype(Number(1)*OtherNumber(1)), Unit1, Unit3>
       operator/(UnitRatio<OtherNumber, Unit3, Unit2> other) const {
     // (U1 / U2) / (U3 / U2) = U1 / U3
     return UnitRatio<decltype(Number(1)*OtherNumber(1)), Unit1, Unit3>(
@@ -160,12 +160,12 @@ private:
   friend class UnitRatio;
 
   template <typename N1, typename N2, typename U1, typename U2>
-  friend inline constexpr UnitRatio<decltype(N1(1) * N2(1)), U1, U2>
+  friend inline KJ_CONSTEXPR UnitRatio<decltype(N1(1) * N2(1)), U1, U2>
       operator*(N1, UnitRatio<N2, U1, U2>);
 };
 
 template <typename N1, typename N2, typename U1, typename U2>
-inline constexpr UnitRatio<decltype(N1(1) * N2(1)), U1, U2>
+inline KJ_CONSTEXPR UnitRatio<decltype(N1(1) * N2(1)), U1, U2>
     operator*(N1 n, UnitRatio<N2, U1, U2> r) {
   return UnitRatio<decltype(N1(1) * N2(1)), U1, U2>(n * r.unit1PerUnit2);
 }
@@ -194,13 +194,13 @@ class Quantity {
   //
   //   class SecondsLabel;
   //   typedef Quantity<double, SecondsLabel> Seconds;
-  //   constexpr Seconds SECONDS = unit<Seconds>();
+  //   KJ_CONSTEXPR Seconds SECONDS = unit<Seconds>();
   //
   //   class MinutesLabel;
   //   typedef Quantity<double, MinutesLabel> Minutes;
-  //   constexpr Minutes MINUTES = unit<Minutes>();
+  //   KJ_CONSTEXPR Minutes MINUTES = unit<Minutes>();
   //
-  //   constexpr UnitRatio<double, SecondsLabel, MinutesLabel> SECONDS_PER_MINUTE =
+  //   KJ_CONSTEXPR UnitRatio<double, SecondsLabel, MinutesLabel> SECONDS_PER_MINUTE =
   //       60 * SECONDS / MINUTES;
   //
   //   void waitFor(Seconds seconds) {
@@ -217,99 +217,99 @@ class Quantity {
   static_assert(isIntegral<Number>(), "Underlying type for Quantity must be integer.");
 
 public:
-  inline constexpr Quantity() {}
+  inline KJ_CONSTEXPR Quantity() {}
 
-  inline constexpr Quantity(decltype(maxValue)): value(maxValue) {}
-  inline constexpr Quantity(decltype(minValue)): value(minValue) {}
+  inline KJ_CONSTEXPR Quantity(decltype(maxValue)): value(maxValue) {}
+  inline KJ_CONSTEXPR Quantity(decltype(minValue)): value(minValue) {}
   // Allow initialization from maxValue and minValue.
 
-  inline explicit constexpr Quantity(Number value): value(value) {}
+  inline explicit KJ_CONSTEXPR Quantity(Number value): value(value) {}
   // This constructor was intended to be private, but GCC complains about it being private in a
   // bunch of places that don't appear to even call it, so I made it public.  Oh well.
 
   template <typename OtherNumber>
-  inline constexpr Quantity(const Quantity<OtherNumber, Unit>& other)
+  inline KJ_CONSTEXPR Quantity(const Quantity<OtherNumber, Unit>& other)
       : value(other.value) {}
 
   template <typename OtherNumber>
-  inline constexpr Quantity<decltype(Number(1) + OtherNumber(1)), Unit>
+  inline KJ_CONSTEXPR Quantity<decltype(Number(1) + OtherNumber(1)), Unit>
       operator+(const Quantity<OtherNumber, Unit>& other) const {
     return Quantity<decltype(Number(1) + OtherNumber(1)), Unit>(value + other.value);
   }
   template <typename OtherNumber>
-  inline constexpr Quantity<decltype(Number(1) - OtherNumber(1)), Unit>
+  inline KJ_CONSTEXPR Quantity<decltype(Number(1) - OtherNumber(1)), Unit>
       operator-(const Quantity<OtherNumber, Unit>& other) const {
     return Quantity<decltype(Number(1) - OtherNumber(1)), Unit>(value - other.value);
   }
   template <typename OtherNumber>
-  inline constexpr Quantity<decltype(Number(1) * OtherNumber(1)), Unit>
+  inline KJ_CONSTEXPR Quantity<decltype(Number(1) * OtherNumber(1)), Unit>
       operator*(OtherNumber other) const {
     static_assert(isIntegral<OtherNumber>(), "Multiplied Quantity by non-integer.");
     return Quantity<decltype(Number(1) * other), Unit>(value * other);
   }
   template <typename OtherNumber>
-  inline constexpr Quantity<decltype(Number(1) / OtherNumber(1)), Unit>
+  inline KJ_CONSTEXPR Quantity<decltype(Number(1) / OtherNumber(1)), Unit>
       operator/(OtherNumber other) const {
     static_assert(isIntegral<OtherNumber>(), "Divided Quantity by non-integer.");
     return Quantity<decltype(Number(1) / other), Unit>(value / other);
   }
   template <typename OtherNumber>
-  inline constexpr decltype(Number(1) / OtherNumber(1))
+  inline KJ_CONSTEXPR decltype(Number(1) / OtherNumber(1))
       operator/(const Quantity<OtherNumber, Unit>& other) const {
     return value / other.value;
   }
   template <typename OtherNumber>
-  inline constexpr decltype(Number(1) % OtherNumber(1))
+  inline KJ_CONSTEXPR decltype(Number(1) % OtherNumber(1))
       operator%(const Quantity<OtherNumber, Unit>& other) const {
     return value % other.value;
   }
 
   template <typename OtherNumber, typename OtherUnit>
-  inline constexpr Quantity<decltype(Number(1) * OtherNumber(1)), OtherUnit>
+  inline KJ_CONSTEXPR Quantity<decltype(Number(1) * OtherNumber(1)), OtherUnit>
       operator*(const UnitRatio<OtherNumber, OtherUnit, Unit>& ratio) const {
     return Quantity<decltype(Number(1) * OtherNumber(1)), OtherUnit>(
         value * ratio.unit1PerUnit2);
   }
   template <typename OtherNumber, typename OtherUnit>
-  inline constexpr Quantity<decltype(Number(1) / OtherNumber(1)), OtherUnit>
+  inline KJ_CONSTEXPR Quantity<decltype(Number(1) / OtherNumber(1)), OtherUnit>
       operator/(const UnitRatio<OtherNumber, Unit, OtherUnit>& ratio) const {
     return Quantity<decltype(Number(1) / OtherNumber(1)), OtherUnit>(
         value / ratio.unit1PerUnit2);
   }
   template <typename OtherNumber, typename OtherUnit>
-  inline constexpr Quantity<decltype(Number(1) % OtherNumber(1)), Unit>
+  inline KJ_CONSTEXPR Quantity<decltype(Number(1) % OtherNumber(1)), Unit>
       operator%(const UnitRatio<OtherNumber, Unit, OtherUnit>& ratio) const {
     return Quantity<decltype(Number(1) % OtherNumber(1)), Unit>(
         value % ratio.unit1PerUnit2);
   }
   template <typename OtherNumber, typename OtherUnit>
-  inline constexpr UnitRatio<decltype(Number(1) / OtherNumber(1)), Unit, OtherUnit>
+  inline KJ_CONSTEXPR UnitRatio<decltype(Number(1) / OtherNumber(1)), Unit, OtherUnit>
       operator/(const Quantity<OtherNumber, OtherUnit>& other) const {
     return UnitRatio<decltype(Number(1) / OtherNumber(1)), Unit, OtherUnit>(value / other.value);
   }
 
   template <typename OtherNumber>
-  inline constexpr bool operator==(const Quantity<OtherNumber, Unit>& other) const {
+  inline KJ_CONSTEXPR bool operator==(const Quantity<OtherNumber, Unit>& other) const {
     return value == other.value;
   }
   template <typename OtherNumber>
-  inline constexpr bool operator!=(const Quantity<OtherNumber, Unit>& other) const {
+  inline KJ_CONSTEXPR bool operator!=(const Quantity<OtherNumber, Unit>& other) const {
     return value != other.value;
   }
   template <typename OtherNumber>
-  inline constexpr bool operator<=(const Quantity<OtherNumber, Unit>& other) const {
+  inline KJ_CONSTEXPR bool operator<=(const Quantity<OtherNumber, Unit>& other) const {
     return value <= other.value;
   }
   template <typename OtherNumber>
-  inline constexpr bool operator>=(const Quantity<OtherNumber, Unit>& other) const {
+  inline KJ_CONSTEXPR bool operator>=(const Quantity<OtherNumber, Unit>& other) const {
     return value >= other.value;
   }
   template <typename OtherNumber>
-  inline constexpr bool operator<(const Quantity<OtherNumber, Unit>& other) const {
+  inline KJ_CONSTEXPR bool operator<(const Quantity<OtherNumber, Unit>& other) const {
     return value < other.value;
   }
   template <typename OtherNumber>
-  inline constexpr bool operator>(const Quantity<OtherNumber, Unit>& other) const {
+  inline KJ_CONSTEXPR bool operator>(const Quantity<OtherNumber, Unit>& other) const {
     return value > other.value;
   }
 
@@ -341,26 +341,26 @@ private:
   friend class Quantity;
 
   template <typename Number1, typename Number2, typename Unit2>
-  friend inline constexpr auto operator*(Number1 a, Quantity<Number2, Unit2> b)
+  friend inline KJ_CONSTEXPR auto operator*(Number1 a, Quantity<Number2, Unit2> b)
       -> Quantity<decltype(Number1(1) * Number2(1)), Unit2>;
 
   template <typename T>
-  friend inline constexpr T unit();
+  friend inline KJ_CONSTEXPR T unit();
 };
 
 template <typename T>
-inline constexpr T unit() { return T(1); }
+inline KJ_CONSTEXPR T unit() { return T(1); }
 // unit<Quantity<T, U>>() returns a Quantity of value 1.  It also, intentionally, works on basic
 // numeric types.
 
 template <typename Number1, typename Number2, typename Unit>
-inline constexpr auto operator*(Number1 a, Quantity<Number2, Unit> b)
+inline KJ_CONSTEXPR auto operator*(Number1 a, Quantity<Number2, Unit> b)
     -> Quantity<decltype(Number1(1) * Number2(1)), Unit> {
   return Quantity<decltype(Number1(1) * Number2(1)), Unit>(a * b.value);
 }
 
 template <typename Number1, typename Number2, typename Unit, typename Unit2>
-inline constexpr auto operator*(UnitRatio<Number1, Unit2, Unit> ratio,
+inline KJ_CONSTEXPR auto operator*(UnitRatio<Number1, Unit2, Unit> ratio,
     Quantity<Number2, Unit> measure)
     -> decltype(measure * ratio) {
   return measure * ratio;
@@ -384,31 +384,31 @@ class Absolute {
   //   units, which is actually totally logical and kind of neat.
 
 public:
-  inline constexpr Absolute operator+(const T& other) const { return Absolute(value + other); }
-  inline constexpr Absolute operator-(const T& other) const { return Absolute(value - other); }
-  inline constexpr T operator-(const Absolute& other) const { return value - other.value; }
+  inline KJ_CONSTEXPR Absolute operator+(const T& other) const { return Absolute(value + other); }
+  inline KJ_CONSTEXPR Absolute operator-(const T& other) const { return Absolute(value - other); }
+  inline KJ_CONSTEXPR T operator-(const Absolute& other) const { return value - other.value; }
 
   inline Absolute& operator+=(const T& other) { value += other; return *this; }
   inline Absolute& operator-=(const T& other) { value -= other; return *this; }
 
-  inline constexpr bool operator==(const Absolute& other) const { return value == other.value; }
-  inline constexpr bool operator!=(const Absolute& other) const { return value != other.value; }
-  inline constexpr bool operator<=(const Absolute& other) const { return value <= other.value; }
-  inline constexpr bool operator>=(const Absolute& other) const { return value >= other.value; }
-  inline constexpr bool operator< (const Absolute& other) const { return value <  other.value; }
-  inline constexpr bool operator> (const Absolute& other) const { return value >  other.value; }
+  inline KJ_CONSTEXPR bool operator==(const Absolute& other) const { return value == other.value; }
+  inline KJ_CONSTEXPR bool operator!=(const Absolute& other) const { return value != other.value; }
+  inline KJ_CONSTEXPR bool operator<=(const Absolute& other) const { return value <= other.value; }
+  inline KJ_CONSTEXPR bool operator>=(const Absolute& other) const { return value >= other.value; }
+  inline KJ_CONSTEXPR bool operator< (const Absolute& other) const { return value <  other.value; }
+  inline KJ_CONSTEXPR bool operator> (const Absolute& other) const { return value >  other.value; }
 
 private:
   T value;
 
-  explicit constexpr Absolute(T value): value(value) {}
+  explicit KJ_CONSTEXPR Absolute(T value): value(value) {}
 
   template <typename U>
-  friend inline constexpr U origin();
+  friend inline KJ_CONSTEXPR U origin();
 };
 
 template <typename T, typename Label>
-inline constexpr Absolute<T, Label> operator+(const T& a, const Absolute<T, Label>& b) {
+inline KJ_CONSTEXPR Absolute<T, Label> operator+(const T& a, const Absolute<T, Label>& b) {
   return b + a;
 }
 
@@ -419,7 +419,7 @@ using UnitOf = typename UnitOf_<T>::Type;
 // UnitOf<Absolute<T, U>> is T.  UnitOf<AnythingElse> is AnythingElse.
 
 template <typename T>
-inline constexpr T origin() { return T(0 * unit<UnitOf<T>>()); }
+inline KJ_CONSTEXPR T origin() { return T(0 * unit<UnitOf<T>>()); }
 // origin<Absolute<T, U>>() returns an Absolute of value 0.  It also, intentionally, works on basic
 // numeric types.
 

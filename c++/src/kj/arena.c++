@@ -43,7 +43,7 @@ Arena::Arena(ArrayPtr<byte> scratch)
   }
 }
 
-Arena::~Arena() noexcept(false) {
+Arena::~Arena() KJ_NOEXCEPT_FALSE {
   // Run cleanup() explicitly, but if it throws an exception, make sure to run it again as part of
   // unwind.  The second call will not throw because destructors are required to guard against
   // exceptions when already unwinding.
@@ -68,7 +68,7 @@ void Arena::cleanup() {
 
 namespace {
 
-constexpr bool isPowerOfTwo(size_t value) {
+KJ_CONSTEXPR bool isPowerOfTwo(size_t value) {
   return (value & (value - 1)) == 0;
 }
 

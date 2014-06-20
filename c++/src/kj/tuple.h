@@ -93,8 +93,8 @@ struct TupleElement {
 
   T value;
   TupleElement() = default;
-  constexpr inline TupleElement(const T& value): value(value) {}
-  constexpr inline TupleElement(T&& value): value(kj::mv(value)) {}
+  KJ_CONSTEXPR inline TupleElement(const T& value): value(value) {}
+  KJ_CONSTEXPR inline TupleElement(T&& value): value(kj::mv(value)) {}
 };
 
 template <uint index, typename T>
@@ -134,13 +134,13 @@ struct TupleImpl<Indexes<indexes...>, Types...>
   }
 
   template <typename... U>
-  constexpr inline TupleImpl(Tuple<U...>&& other)
+  KJ_CONSTEXPR inline TupleImpl(Tuple<U...>&& other)
       : TupleElement<indexes, Types>(kj::mv(getImpl<indexes>(other)))... {}
   template <typename... U>
-  constexpr inline TupleImpl(Tuple<U...>& other)
+  KJ_CONSTEXPR inline TupleImpl(Tuple<U...>& other)
       : TupleElement<indexes, Types>(getImpl<indexes>(other))... {}
   template <typename... U>
-  constexpr inline TupleImpl(const Tuple<U...>& other)
+  KJ_CONSTEXPR inline TupleImpl(const Tuple<U...>& other)
       : TupleElement<indexes, Types>(getImpl<indexes>(other))... {}
 };
 
@@ -153,15 +153,15 @@ class Tuple {
 public:
   Tuple() = default;
   template <typename... U>
-  constexpr inline Tuple(Tuple<U...>&& other): impl(kj::mv(other)) {}
+  KJ_CONSTEXPR inline Tuple(Tuple<U...>&& other): impl(kj::mv(other)) {}
   template <typename... U>
-  constexpr inline Tuple(Tuple<U...>& other): impl(other) {}
+  KJ_CONSTEXPR inline Tuple(Tuple<U...>& other): impl(other) {}
   template <typename... U>
-  constexpr inline Tuple(const Tuple<U...>& other): impl(other) {}
+  KJ_CONSTEXPR inline Tuple(const Tuple<U...>& other): impl(other) {}
 
 private:
   template <typename... Params>
-  constexpr Tuple(Params&&... params): impl(kj::fwd<Params>(params)...) {}
+  KJ_CONSTEXPR Tuple(Params&&... params): impl(kj::fwd<Params>(params)...) {}
 
   TupleImpl<MakeIndexes<sizeof...(T)>, T...> impl;
 
@@ -177,7 +177,7 @@ private:
 template <>
 class Tuple<> {
   // Simplified zero-member version of Tuple.  In particular this is important to make sure that
-  // Tuple<>() is constexpr.
+  // Tuple<>() is KJ_CONSTEXPR.
 };
 
 template <typename T>

@@ -127,7 +127,7 @@ enum class FieldSize: uint8_t {
 typedef decltype(BITS / ELEMENTS) BitsPerElement;
 typedef decltype(POINTERS / ELEMENTS) PointersPerElement;
 
-static constexpr BitsPerElement BITS_PER_ELEMENT_TABLE[8] = {
+static KJ_CONSTEXPR BitsPerElement BITS_PER_ELEMENT_TABLE[8] = {
     0 * BITS / ELEMENTS,
     1 * BITS / ELEMENTS,
     8 * BITS / ELEMENTS,
@@ -138,22 +138,22 @@ static constexpr BitsPerElement BITS_PER_ELEMENT_TABLE[8] = {
     0 * BITS / ELEMENTS
 };
 
-inline constexpr BitsPerElement dataBitsPerElement(FieldSize size) {
+inline KJ_CONSTEXPR BitsPerElement dataBitsPerElement(FieldSize size) {
   return _::BITS_PER_ELEMENT_TABLE[static_cast<int>(size)];
 }
 
-inline constexpr PointersPerElement pointersPerElement(FieldSize size) {
+inline KJ_CONSTEXPR PointersPerElement pointersPerElement(FieldSize size) {
   return size == FieldSize::POINTER ? 1 * POINTERS / ELEMENTS : 0 * POINTERS / ELEMENTS;
 }
 
 template <size_t size> struct ElementSizeForByteSize;
-template <> struct ElementSizeForByteSize<1> { static constexpr FieldSize value = FieldSize::BYTE; };
-template <> struct ElementSizeForByteSize<2> { static constexpr FieldSize value = FieldSize::TWO_BYTES; };
-template <> struct ElementSizeForByteSize<4> { static constexpr FieldSize value = FieldSize::FOUR_BYTES; };
-template <> struct ElementSizeForByteSize<8> { static constexpr FieldSize value = FieldSize::EIGHT_BYTES; };
+template <> struct ElementSizeForByteSize<1> { static KJ_CONSTEXPR FieldSize value = FieldSize::BYTE; };
+template <> struct ElementSizeForByteSize<2> { static KJ_CONSTEXPR FieldSize value = FieldSize::TWO_BYTES; };
+template <> struct ElementSizeForByteSize<4> { static KJ_CONSTEXPR FieldSize value = FieldSize::FOUR_BYTES; };
+template <> struct ElementSizeForByteSize<8> { static KJ_CONSTEXPR FieldSize value = FieldSize::EIGHT_BYTES; };
 
 template <typename T> struct ElementSizeForType {
-  static constexpr FieldSize value =
+  static KJ_CONSTEXPR FieldSize value =
       // Primitive types that aren't special-cased below can be determined from sizeof().
       kind<T>() == Kind::PRIMITIVE ? ElementSizeForByteSize<sizeof(T)>::value :
       kind<T>() == Kind::ENUM ? FieldSize::TWO_BYTES :
@@ -164,22 +164,22 @@ template <typename T> struct ElementSizeForType {
 };
 
 // Void and bool are special.
-template <> struct ElementSizeForType<Void> { static constexpr FieldSize value = FieldSize::VOID; };
-template <> struct ElementSizeForType<bool> { static constexpr FieldSize value = FieldSize::BIT; };
+template <> struct ElementSizeForType<Void> { static KJ_CONSTEXPR FieldSize value = FieldSize::VOID; };
+template <> struct ElementSizeForType<bool> { static KJ_CONSTEXPR FieldSize value = FieldSize::BIT; };
 
 // Lists and blobs are pointers, not structs.
 template <typename T, bool b> struct ElementSizeForType<List<T, b>> {
-  static constexpr FieldSize value = FieldSize::POINTER;
+  static KJ_CONSTEXPR FieldSize value = FieldSize::POINTER;
 };
 template <> struct ElementSizeForType<Text> {
-  static constexpr FieldSize value = FieldSize::POINTER;
+  static KJ_CONSTEXPR FieldSize value = FieldSize::POINTER;
 };
 template <> struct ElementSizeForType<Data> {
-  static constexpr FieldSize value = FieldSize::POINTER;
+  static KJ_CONSTEXPR FieldSize value = FieldSize::POINTER;
 };
 
 template <typename T>
-inline constexpr FieldSize elementSizeForType() {
+inline KJ_CONSTEXPR FieldSize elementSizeForType() {
   return ElementSizeForType<T>::value;
 }
 
@@ -218,19 +218,19 @@ struct StructSize {
   // only if the struct is larger than one word; otherwise the struct list can be encoded more
   // efficiently by encoding it as if it were some primitive type.
 
-  inline constexpr WordCount total() const { return data + pointers * WORDS_PER_POINTER; }
+  inline KJ_CONSTEXPR WordCount total() const { return data + pointers * WORDS_PER_POINTER; }
 
   StructSize() = default;
-  inline constexpr StructSize(WordCount data, WirePointerCount pointers,
+  inline KJ_CONSTEXPR StructSize(WordCount data, WirePointerCount pointers,
                               FieldSize preferredListEncoding)
       : data(data), pointers(pointers), preferredListEncoding(preferredListEncoding) {}
 };
 
 template <typename T> struct StructSize_;
-// Specialized for every struct type with member:  static constexpr StructSize value"
+// Specialized for every struct type with member:  static KJ_CONSTEXPR StructSize value"
 
 template <typename T>
-inline constexpr StructSize structSize() {
+inline KJ_CONSTEXPR StructSize structSize() {
   return StructSize_<T>::value;
 }
 
@@ -732,8 +732,8 @@ class OrphanBuilder {
 public:
   inline OrphanBuilder(): segment(nullptr), location(nullptr) { memset(&tag, 0, sizeof(tag)); }
   OrphanBuilder(const OrphanBuilder& other) = delete;
-  inline OrphanBuilder(OrphanBuilder&& other) noexcept;
-  inline ~OrphanBuilder() noexcept(false);
+  inline OrphanBuilder(OrphanBuilder&& other) KJ_NOEXCEPT;
+  inline ~OrphanBuilder() KJ_NOEXCEPT_FALSE;
 
   static OrphanBuilder initStruct(BuilderArena* arena, StructSize size);
   static OrphanBuilder initList(BuilderArena* arena, ElementCount elementCount,
@@ -1074,14 +1074,14 @@ inline PointerReader ListReader::getPointerElement(ElementCount index) const {
 
 // -------------------------------------------------------------------
 
-inline OrphanBuilder::OrphanBuilder(OrphanBuilder&& other) noexcept
+inline OrphanBuilder::OrphanBuilder(OrphanBuilder&& other) KJ_NOEXCEPT
     : segment(other.segment), location(other.location) {
   memcpy(&tag, &other.tag, sizeof(tag));  // Needs memcpy to comply with aliasing rules.
   other.segment = nullptr;
   other.location = nullptr;
 }
 
-inline OrphanBuilder::~OrphanBuilder() noexcept(false) {
+inline OrphanBuilder::~OrphanBuilder() KJ_NOEXCEPT_FALSE {
   if (segment != nullptr) euthanize();
 }
 

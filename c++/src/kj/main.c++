@@ -266,7 +266,7 @@ MainBuilder::MainBuilder(ProcessContext& context, StringPtr version,
             "Print version information and exit.");
 }
 
-MainBuilder::~MainBuilder() noexcept(false) {}
+MainBuilder::~MainBuilder() KJ_NOEXCEPT_FALSE {}
 
 MainBuilder& MainBuilder::addOption(std::initializer_list<OptionName> names,
                                     Function<Validity()> callback,

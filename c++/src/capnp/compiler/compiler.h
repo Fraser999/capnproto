@@ -70,7 +70,7 @@ public:
   };
 
   explicit Compiler(AnnotationFlag annotationFlag = COMPILE_ANNOTATIONS);
-  ~Compiler() noexcept(false);
+  ~Compiler() KJ_NOEXCEPT_FALSE;
   KJ_DISALLOW_COPY(Compiler);
 
   uint64_t add(Module& module) const;

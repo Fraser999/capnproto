@@ -50,7 +50,7 @@ class UnixEventPort: public EventPort {
 
 public:
   UnixEventPort();
-  ~UnixEventPort() noexcept(false);
+  ~UnixEventPort() KJ_NOEXCEPT_FALSE;
 
   Promise<short> onFdEvent(int fd, short eventMask);
   // `eventMask` is a bitwise-OR of poll events (e.g. `POLLIN`, `POLLOUT`, etc.).  The next time

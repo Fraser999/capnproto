@@ -389,7 +389,7 @@ kj::Maybe<InterfaceSchema::Method> InterfaceSchema::findMethodByName(kj::StringP
   return findMethodByName(name, counter);
 }
 
-static constexpr uint MAX_SUPERCLASSES = 64;
+static KJ_CONSTEXPR uint MAX_SUPERCLASSES = 64;
 
 kj::Maybe<InterfaceSchema::Method> InterfaceSchema::findMethodByName(
     kj::StringPtr name, uint& counter) const {

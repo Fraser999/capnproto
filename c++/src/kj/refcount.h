@@ -55,7 +55,7 @@ class Refcounted: private Disposer {
   //   Own<T> could also be nice.
 
 public:
-  virtual ~Refcounted() noexcept(false);
+  virtual ~Refcounted() KJ_NOEXCEPT_FALSE;
 
 private:
   mutable uint refcount = 0;

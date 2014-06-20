@@ -39,7 +39,7 @@ public:
     threadEzContext = this;
   }
 
-  ~EzRpcContext() noexcept(false) {
+  ~EzRpcContext() KJ_NOEXCEPT_FALSE {
     KJ_REQUIRE(threadEzContext == this,
                "EzRpcContext destroyed from different thread than it was created.") {
       return;
@@ -138,7 +138,7 @@ EzRpcClient::EzRpcClient(const struct sockaddr* serverAddress, uint addrSize)
 EzRpcClient::EzRpcClient(int socketFd)
     : impl(kj::heap<Impl>(socketFd)) {}
 
-EzRpcClient::~EzRpcClient() noexcept(false) {}
+EzRpcClient::~EzRpcClient() KJ_NOEXCEPT_FALSE {}
 
 Capability::Client EzRpcClient::importCap(kj::StringPtr name) {
   KJ_IF_MAYBE(client, impl->clientContext) {
@@ -269,7 +269,7 @@ EzRpcServer::EzRpcServer(struct sockaddr* bindAddress, uint addrSize)
 EzRpcServer::EzRpcServer(int socketFd, uint port)
     : impl(kj::heap<Impl>(socketFd, port)) {}
 
-EzRpcServer::~EzRpcServer() noexcept(false) {}
+EzRpcServer::~EzRpcServer() KJ_NOEXCEPT_FALSE {}
 
 void EzRpcServer::exportCap(kj::StringPtr name, Capability::Client cap) {
   Impl::ExportedCap entry(kj::heapString(name), cap);

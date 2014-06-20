@@ -39,21 +39,21 @@ namespace _ {  // private
 namespace {
 
 template <typename T>
-inline constexpr uint messageSizeHint() {
+inline KJ_CONSTEXPR uint messageSizeHint() {
   return 1 + sizeInWords<rpc::Message>() + sizeInWords<T>();
 }
 template <>
-inline constexpr uint messageSizeHint<void>() {
+inline KJ_CONSTEXPR uint messageSizeHint<void>() {
   return 1 + sizeInWords<rpc::Message>();
 }
 
-constexpr const uint MESSAGE_TARGET_SIZE_HINT = sizeInWords<rpc::MessageTarget>() +
+KJ_CONSTEXPR const uint MESSAGE_TARGET_SIZE_HINT = sizeInWords<rpc::MessageTarget>() +
     sizeInWords<rpc::PromisedAnswer>() + 16;  // +16 for ops; hope that's enough
 
-constexpr const uint CAP_DESCRIPTOR_SIZE_HINT = sizeInWords<rpc::CapDescriptor>() +
+KJ_CONSTEXPR const uint CAP_DESCRIPTOR_SIZE_HINT = sizeInWords<rpc::CapDescriptor>() +
     sizeInWords<rpc::PromisedAnswer>();
 
-constexpr const uint64_t MAX_SIZE_HINT = 1 << 20;
+KJ_CONSTEXPR const uint64_t MAX_SIZE_HINT = 1 << 20;
 
 uint copySizeHint(MessageSize size) {
   uint64_t sizeHint = size.wordCount + size.capCount * CAP_DESCRIPTOR_SIZE_HINT;
@@ -623,7 +623,7 @@ private:
     ImportClient(RpcConnectionState& connectionState, ImportId importId)
         : RpcClient(connectionState), importId(importId) {}
 
-    ~ImportClient() noexcept(false) {
+    ~ImportClient() KJ_NOEXCEPT_FALSE {
       unwindDetector.catchExceptionsIfUnwinding([&]() {
         // Remove self from the import table, if the table is still pointing at us.
         KJ_IF_MAYBE(import, connectionState->imports.find(importId)) {
@@ -761,7 +761,7 @@ private:
       // import ID is not released).
     }
 
-    ~PromiseClient() noexcept(false) {
+    ~PromiseClient() KJ_NOEXCEPT_FALSE {
       KJ_IF_MAYBE(id, importId) {
         // This object is representing an import promise.  That means the import table may still
         // contain a pointer back to it.  Remove that pointer.  Note that we have to verify that
@@ -1553,7 +1553,7 @@ private:
           redirectResults(redirectResults),
           cancelFulfiller(kj::mv(cancelFulfiller)) {}
 
-    ~RpcCallContext() noexcept(false) {
+    ~RpcCallContext() KJ_NOEXCEPT_FALSE {
       if (isFirstResponder()) {
         // We haven't sent a return yet, so we must have been canceled.  Send a cancellation return.
         unwindDetector.catchExceptionsIfUnwinding([&]() {
@@ -2438,7 +2438,7 @@ public:
     tasks.add(acceptLoop());
   }
 
-  ~Impl() noexcept(false) {
+  ~Impl() KJ_NOEXCEPT_FALSE {
     unwindDetector.catchExceptionsIfUnwinding([&]() {
       // std::unordered_map doesn't like it when elements' destructors throw, so carefully
       // disassemble it.
@@ -2517,8 +2517,8 @@ private:
 
 RpcSystemBase::RpcSystemBase(VatNetworkBase& network, kj::Maybe<SturdyRefRestorerBase&> restorer)
     : impl(kj::heap<Impl>(network, restorer)) {}
-RpcSystemBase::RpcSystemBase(RpcSystemBase&& other) noexcept = default;
-RpcSystemBase::~RpcSystemBase() noexcept(false) {}
+RpcSystemBase::RpcSystemBase(RpcSystemBase&& other) KJ_NOEXCEPT = default;
+RpcSystemBase::~RpcSystemBase() KJ_NOEXCEPT_FALSE {}
 
 Capability::Client RpcSystemBase::baseRestore(
     _::StructReader hostId, AnyPointer::Reader objectId) {

@@ -104,7 +104,7 @@ public:
     loop.signalTail = &next;
   }
 
-  ~SignalPromiseAdapter() noexcept(false) {
+  ~SignalPromiseAdapter() KJ_NOEXCEPT_FALSE {
     if (prev != nullptr) {
       if (next == nullptr) {
         loop.signalTail = prev;
@@ -145,7 +145,7 @@ public:
     loop.pollTail = &next;
   }
 
-  ~PollPromiseAdapter() noexcept(false) {
+  ~PollPromiseAdapter() KJ_NOEXCEPT_FALSE {
     if (prev != nullptr) {
       if (next == nullptr) {
         loop.pollTail = prev;
@@ -211,7 +211,7 @@ UnixEventPort::UnixEventPort()
   pthread_once(&registerReservedSignalOnce, &registerReservedSignal);
 }
 
-UnixEventPort::~UnixEventPort() noexcept(false) {}
+UnixEventPort::~UnixEventPort() KJ_NOEXCEPT_FALSE {}
 
 Promise<short> UnixEventPort::onFdEvent(int fd, short eventMask) {
   return newAdaptedPromise<short, PollPromiseAdapter>(*this, fd, eventMask);
@@ -332,7 +332,7 @@ void UnixEventPort::wait() {
   // poll()'s timeout is an `int` count of milliseconds, so truncate to that.
   // Also, make sure that we aren't within a millisecond of overflowing a `Duration` since that
   // will break the math below.
-  constexpr Duration MAX_TIMEOUT =
+  KJ_CONSTEXPR Duration MAX_TIMEOUT =
       min(int(maxValue) * MILLISECONDS, Duration(maxValue) - MILLISECONDS);
 
   int pollTimeout = -1;

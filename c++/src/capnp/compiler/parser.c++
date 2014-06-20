@@ -227,21 +227,21 @@ struct MatchTokenType {
     p::transformOrReject(p::any, \
         MatchTokenType<type, Token::discrim, &Token::Reader::getter>())
 
-constexpr auto identifier = TOKEN_TYPE_PARSER(Text::Reader, IDENTIFIER, getIdentifier);
-constexpr auto stringLiteral = TOKEN_TYPE_PARSER(Text::Reader, STRING_LITERAL, getStringLiteral);
-constexpr auto integerLiteral = TOKEN_TYPE_PARSER(uint64_t, INTEGER_LITERAL, getIntegerLiteral);
-constexpr auto floatLiteral = TOKEN_TYPE_PARSER(double, FLOAT_LITERAL, getFloatLiteral);
-constexpr auto operatorToken = TOKEN_TYPE_PARSER(Text::Reader, OPERATOR, getOperator);
-constexpr auto rawParenthesizedList =
+KJ_CONSTEXPR auto identifier = TOKEN_TYPE_PARSER(Text::Reader, IDENTIFIER, getIdentifier);
+KJ_CONSTEXPR auto stringLiteral = TOKEN_TYPE_PARSER(Text::Reader, STRING_LITERAL, getStringLiteral);
+KJ_CONSTEXPR auto integerLiteral = TOKEN_TYPE_PARSER(uint64_t, INTEGER_LITERAL, getIntegerLiteral);
+KJ_CONSTEXPR auto floatLiteral = TOKEN_TYPE_PARSER(double, FLOAT_LITERAL, getFloatLiteral);
+KJ_CONSTEXPR auto operatorToken = TOKEN_TYPE_PARSER(Text::Reader, OPERATOR, getOperator);
+KJ_CONSTEXPR auto rawParenthesizedList =
     TOKEN_TYPE_PARSER(List<List<Token>>::Reader, PARENTHESIZED_LIST, getParenthesizedList);
-constexpr auto rawBracketedList =
+KJ_CONSTEXPR auto rawBracketedList =
     TOKEN_TYPE_PARSER(List<List<Token>>::Reader, BRACKETED_LIST, getBracketedList);
 
 // =======================================================================================
 
 class ExactString {
 public:
-  constexpr ExactString(const char* expected): expected(expected) {}
+  KJ_CONSTEXPR ExactString(const char* expected): expected(expected) {}
 
   kj::Maybe<kj::Tuple<>> operator()(Located<Text::Reader>&& text) const {
     if (text.value == expected) {
@@ -255,12 +255,12 @@ private:
   const char* expected;
 };
 
-constexpr auto keyword(const char* expected)
+KJ_CONSTEXPR auto keyword(const char* expected)
     -> decltype(p::transformOrReject(identifier, ExactString(expected))) {
   return p::transformOrReject(identifier, ExactString(expected));
 }
 
-constexpr auto op(const char* expected)
+KJ_CONSTEXPR auto op(const char* expected)
     -> decltype(p::transformOrReject(operatorToken, ExactString(expected))) {
   return p::transformOrReject(operatorToken, ExactString(expected));
 }
@@ -272,7 +272,7 @@ class ParseListItems {
   // Transformer that parses all items in the input token sequence list using the given parser.
 
 public:
-  constexpr ParseListItems(ItemParser&& itemParser, ErrorReporter& errorReporter)
+  KJ_CONSTEXPR ParseListItems(ItemParser&& itemParser, ErrorReporter& errorReporter)
       : itemParser(p::sequence(kj::fwd<ItemParser>(itemParser), p::endOfInput)),
         errorReporter(errorReporter) {}
 
@@ -314,7 +314,7 @@ private:
 };
 
 template <typename ItemParser>
-constexpr auto parenthesizedList(ItemParser&& itemParser, ErrorReporter& errorReporter) -> decltype(
+KJ_CONSTEXPR auto parenthesizedList(ItemParser&& itemParser, ErrorReporter& errorReporter) -> decltype(
          transform(rawParenthesizedList, ParseListItems<ItemParser>(
              kj::fwd<ItemParser>(itemParser), errorReporter))) {
   return transform(rawParenthesizedList, ParseListItems<ItemParser>(
@@ -322,7 +322,7 @@ constexpr auto parenthesizedList(ItemParser&& itemParser, ErrorReporter& errorRe
 }
 
 template <typename ItemParser>
-constexpr auto bracketedList(ItemParser&& itemParser, ErrorReporter& errorReporter) -> decltype(
+KJ_CONSTEXPR auto bracketedList(ItemParser&& itemParser, ErrorReporter& errorReporter) -> decltype(
          transform(rawBracketedList, ParseListItems<ItemParser>(
              kj::fwd<ItemParser>(itemParser), errorReporter))) {
   return transform(rawBracketedList, ParseListItems<ItemParser>(
@@ -1010,7 +1010,7 @@ CapnpParser::CapnpParser(Orphanage orphanageParam, ErrorReporter& errorReporterP
       parsers.methodDecl, parsers.genericDecl));
 }
 
-CapnpParser::~CapnpParser() noexcept(false) {}
+CapnpParser::~CapnpParser() KJ_NOEXCEPT_FALSE {}
 
 kj::Maybe<Orphan<Declaration>> CapnpParser::parseStatement(
     Statement::Reader statement, const DeclParser& parser) {

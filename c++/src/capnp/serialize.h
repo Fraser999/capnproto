@@ -90,7 +90,7 @@ public:
   InputStreamMessageReader(kj::InputStream& inputStream,
                            ReaderOptions options = ReaderOptions(),
                            kj::ArrayPtr<word> scratchSpace = nullptr);
-  ~InputStreamMessageReader() noexcept(false);
+  ~InputStreamMessageReader() KJ_NOEXCEPT_FALSE;
 
   // implements MessageReader ----------------------------------------
   kj::ArrayPtr<const word> getSegment(uint id) override;
@@ -133,7 +133,7 @@ public:
       : FdInputStream(kj::mv(fd)), InputStreamMessageReader(*this, options, scratchSpace) {}
   // Read a message from a file descriptor, taking ownership of the descriptor.
 
-  ~StreamFdMessageReader() noexcept(false);
+  ~StreamFdMessageReader() KJ_NOEXCEPT_FALSE;
 };
 
 void writeMessageToFd(int fd, MessageBuilder& builder);

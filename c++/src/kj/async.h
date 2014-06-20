@@ -314,11 +314,11 @@ private:
   friend class EventLoop;
 };
 
-constexpr _::Void READY_NOW = _::Void();
+KJ_CONSTEXPR _::Void READY_NOW = _::Void();
 // Use this when you need a Promise<void> that is already fulfilled -- this value can be implicitly
 // cast to `Promise<void>`.
 
-constexpr _::NeverDone NEVER_DONE = _::NeverDone();
+KJ_CONSTEXPR _::NeverDone NEVER_DONE = _::NeverDone();
 // The opposite of `READY_NOW`, return this when the promise should never resolve.  This can be
 // implicitly converted to any promise type.  You may also call `NEVER_DONE.wait()` to wait
 // forever (useful for servers).
@@ -488,7 +488,7 @@ public:
   // `loop` will be used to wait on promises.  `errorHandler` will be executed any time a task
   // throws an exception, and will execute within the given EventLoop.
 
-  ~TaskSet() noexcept(false);
+  ~TaskSet() KJ_NOEXCEPT_FALSE;
 
   void add(Promise<void>&& promise);
 
@@ -577,7 +577,7 @@ public:
   explicit EventLoop(EventPort& port);
   // Construct an `EventLoop` which receives external events through the given `EventPort`.
 
-  ~EventLoop() noexcept(false);
+  ~EventLoop() KJ_NOEXCEPT_FALSE;
 
   void run(uint maxTurnCount = maxValue);
   // Run the event loop for `maxTurnCount` turns or until there is nothing left to be done,

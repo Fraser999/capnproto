@@ -52,7 +52,7 @@ public:
   // `orphanage` is used to allocate Cap'n Proto message objects in the result.  `inputStart` is
   // a pointer to the beginning of the input, used to compute byte offsets.
 
-  ~Lexer() noexcept(false);
+  ~Lexer() KJ_NOEXCEPT_FALSE;
 
   class ParserInput: public kj::parse::IteratorInput<char, const char*> {
     // Like IteratorInput<char, const char*> except that positions are measured as byte offsets

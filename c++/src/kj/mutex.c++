@@ -195,7 +195,7 @@ void Once::reset() {
   }
 }
 
-void Once::disable() noexcept {
+void Once::disable() KJ_NOEXCEPT {
   uint state = __atomic_load_n(&futex, __ATOMIC_ACQUIRE);
   for (;;) {
     switch (state) {
@@ -322,7 +322,7 @@ void Once::reset() {
   }
 }
 
-void Once::disable() noexcept {
+void Once::disable() KJ_NOEXCEPT {
   KJ_PTHREAD_CALL(pthread_mutex_lock(&mutex));
   KJ_DEFER(KJ_PTHREAD_CALL(pthread_mutex_unlock(&mutex)));
 

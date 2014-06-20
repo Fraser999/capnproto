@@ -53,7 +53,7 @@ TEST(Exception, RunCatchingExceptions) {
 
 class ThrowingDestructor: public UnwindDetector {
 public:
-  ~ThrowingDestructor() noexcept(false) {
+  ~ThrowingDestructor() KJ_NOEXCEPT_FALSE {
     catchExceptionsIfUnwinding([]() {
       KJ_FAIL_ASSERT("this is a test, not a real bug") { break; }
     });

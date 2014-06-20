@@ -39,7 +39,7 @@ class SchemaParser {
 
 public:
   SchemaParser();
-  ~SchemaParser() noexcept(false);
+  ~SchemaParser() KJ_NOEXCEPT_FALSE;
 
   ParsedSchema parseDiskFile(kj::StringPtr displayName, kj::StringPtr diskPath,
                              kj::ArrayPtr<const kj::StringPtr> importPath) const;

@@ -94,7 +94,7 @@ struct Field {
     SLOT,
     GROUP,
   };
-  static constexpr  ::uint16_t NO_DISCRIMINANT = 65535u;
+  static KJ_CONSTEXPR  ::uint16_t NO_DISCRIMINANT = 65535u;
   struct Slot;
   struct Group;
   struct Ordinal;

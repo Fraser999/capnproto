@@ -118,7 +118,7 @@ public:
   ParserRef& operator=(ParserRef&& other) = default;
 
   template <typename Other>
-  constexpr ParserRef(Other&& other)
+  KJ_CONSTEXPR ParserRef(Other&& other)
       : parser(&other), wrapper(&WrapperImplInstance<Decay<Other>>::instance) {
     static_assert(kj::isReference<Other>(), "ParseRef should not be assigned to a temporary.");
   }
@@ -149,7 +149,7 @@ private:
   };
   template <typename ParserImpl>
   struct WrapperImplInstance {
-    static constexpr WrapperImpl<ParserImpl> instance = WrapperImpl<ParserImpl>();
+    static KJ_CONSTEXPR WrapperImpl<ParserImpl> instance = WrapperImpl<ParserImpl>();
   };
 
   const void* parser;
@@ -158,11 +158,11 @@ private:
 
 template <typename Input, typename Output>
 template <typename ParserImpl>
-constexpr ParserRef<Input, Output>::WrapperImpl<ParserImpl>
+KJ_CONSTEXPR ParserRef<Input, Output>::WrapperImpl<ParserImpl>
 ParserRef<Input, Output>::WrapperImplInstance<ParserImpl>::instance;
 
 template <typename Input, typename ParserImpl>
-constexpr ParserRef<Input, OutputType<ParserImpl, Input>> ref(ParserImpl& impl) {
+KJ_CONSTEXPR ParserRef<Input, OutputType<ParserImpl, Input>> ref(ParserImpl& impl) {
   // Constructs a ParserRef.  You must specify the input type explicitly, e.g.
   // `ref<MyInput>(myParser)`.
 
@@ -185,7 +185,7 @@ public:
   }
 };
 
-constexpr Any_ any = Any_();
+KJ_CONSTEXPR Any_ any = Any_();
 // A parser which matches any token and simply returns it.
 
 // -------------------------------------------------------------------
@@ -195,7 +195,7 @@ constexpr Any_ any = Any_();
 template <typename T>
 class Exactly_ {
 public:
-  explicit constexpr Exactly_(T&& expected): expected(expected) {}
+  explicit KJ_CONSTEXPR Exactly_(T&& expected): expected(expected) {}
 
   template <typename Input>
   Maybe<Tuple<>> operator()(Input& input) const {
@@ -212,7 +212,7 @@ private:
 };
 
 template <typename T>
-constexpr Exactly_<T> exactly(T&& expected) {
+KJ_CONSTEXPR Exactly_<T> exactly(T&& expected) {
   // Constructs a parser which succeeds when the input is exactly the token specified.  The
   // result is always the empty tuple.
 
@@ -226,7 +226,7 @@ constexpr Exactly_<T> exactly(T&& expected) {
 template <typename T, T expected>
 class ExactlyConst_ {
 public:
-  explicit constexpr ExactlyConst_() {}
+  explicit KJ_CONSTEXPR ExactlyConst_() {}
 
   template <typename Input>
   Maybe<Tuple<>> operator()(Input& input) const {
@@ -240,7 +240,7 @@ public:
 };
 
 template <typename T, T expected>
-constexpr ExactlyConst_<T, expected> exactlyConst() {
+KJ_CONSTEXPR ExactlyConst_<T, expected> exactlyConst() {
   // Constructs a parser which succeeds when the input is exactly the token specified.  The
   // result is always the empty tuple.  This parser is templated on the token value which may cause
   // it to perform better -- or worse.  Be sure to measure.
@@ -254,7 +254,7 @@ constexpr ExactlyConst_<T, expected> exactlyConst() {
 template <typename SubParser, typename Result>
 class ConstResult_ {
 public:
-  explicit constexpr ConstResult_(SubParser&& subParser, Result&& result)
+  explicit KJ_CONSTEXPR ConstResult_(SubParser&& subParser, Result&& result)
       : subParser(kj::fwd<SubParser>(subParser)), result(kj::fwd<Result>(result)) {}
 
   template <typename Input>
@@ -272,13 +272,13 @@ private:
 };
 
 template <typename SubParser, typename Result>
-constexpr ConstResult_<SubParser, Result> constResult(SubParser&& subParser, Result&& result) {
+KJ_CONSTEXPR ConstResult_<SubParser, Result> constResult(SubParser&& subParser, Result&& result) {
   // Constructs a parser which returns exactly `result` if `subParser` is successful.
   return ConstResult_<SubParser, Result>(kj::fwd<SubParser>(subParser), kj::fwd<Result>(result));
 }
 
 template <typename SubParser>
-constexpr ConstResult_<SubParser, Tuple<>> discard(SubParser&& subParser) {
+KJ_CONSTEXPR ConstResult_<SubParser, Tuple<>> discard(SubParser&& subParser) {
   // Constructs a parser which wraps `subParser` but discards the result.
   return constResult(kj::fwd<SubParser>(subParser), Tuple<>());
 }
@@ -293,7 +293,7 @@ template <typename FirstSubParser, typename... SubParsers>
 class Sequence_<FirstSubParser, SubParsers...> {
 public:
   template <typename T, typename... U>
-  explicit constexpr Sequence_(T&& firstSubParser, U&&... rest)
+  explicit KJ_CONSTEXPR Sequence_(T&& firstSubParser, U&&... rest)
       : first(kj::fwd<T>(firstSubParser)), rest(kj::fwd<U>(rest)...) {}
 
   template <typename Input>
@@ -339,7 +339,7 @@ public:
 };
 
 template <typename... SubParsers>
-constexpr Sequence_<SubParsers...> sequence(SubParsers&&... subParsers) {
+KJ_CONSTEXPR Sequence_<SubParsers...> sequence(SubParsers&&... subParsers) {
   // Constructs a parser that executes each of the parameter parsers in sequence and returns a
   // tuple of their results.
 
@@ -355,7 +355,7 @@ class Many_ {
   template <typename Input, typename Output = OutputType<SubParser, Input>>
   struct Impl;
 public:
-  explicit constexpr Many_(SubParser&& subParser)
+  explicit KJ_CONSTEXPR Many_(SubParser&& subParser)
       : subParser(kj::fwd<SubParser>(subParser)) {}
 
   template <typename Input>
@@ -427,14 +427,14 @@ auto Many_<SubParser, atLeastOne>::operator()(Input& input) const
 }
 
 template <typename SubParser>
-constexpr Many_<SubParser, false> many(SubParser&& subParser) {
+KJ_CONSTEXPR Many_<SubParser, false> many(SubParser&& subParser) {
   // Constructs a parser that repeatedly executes the given parser until it fails, returning an
   // Array of the results (or a uint count if `subParser` returns an empty tuple).
   return Many_<SubParser, false>(kj::fwd<SubParser>(subParser));
 }
 
 template <typename SubParser>
-constexpr Many_<SubParser, true> oneOrMore(SubParser&& subParser) {
+KJ_CONSTEXPR Many_<SubParser, true> oneOrMore(SubParser&& subParser) {
   // Like `many()` but the parser must parse at least one item to be successful.
   return Many_<SubParser, true>(kj::fwd<SubParser>(subParser));
 }
@@ -448,7 +448,7 @@ class Times_ {
   template <typename Input, typename Output = OutputType<SubParser, Input>>
   struct Impl;
 public:
-  explicit constexpr Times_(SubParser&& subParser, uint count)
+  explicit KJ_CONSTEXPR Times_(SubParser&& subParser, uint count)
       : subParser(kj::fwd<SubParser>(subParser)), count(count) {}
 
   template <typename Input>
@@ -510,7 +510,7 @@ auto Times_<SubParser>::operator()(Input& input) const
 }
 
 template <typename SubParser>
-constexpr Times_<SubParser> times(SubParser&& subParser, uint count) {
+KJ_CONSTEXPR Times_<SubParser> times(SubParser&& subParser, uint count) {
   // Constructs a parser that repeats the subParser exactly `count` times.
   return Times_<SubParser>(kj::fwd<SubParser>(subParser), count);
 }
@@ -522,7 +522,7 @@ constexpr Times_<SubParser> times(SubParser&& subParser, uint count) {
 template <typename SubParser>
 class Optional_ {
 public:
-  explicit constexpr Optional_(SubParser&& subParser)
+  explicit KJ_CONSTEXPR Optional_(SubParser&& subParser)
       : subParser(kj::fwd<SubParser>(subParser)) {}
 
   template <typename Input>
@@ -543,7 +543,7 @@ private:
 };
 
 template <typename SubParser>
-constexpr Optional_<SubParser> optional(SubParser&& subParser) {
+KJ_CONSTEXPR Optional_<SubParser> optional(SubParser&& subParser) {
   // Constructs a parser that accepts zero or one of the given sub-parser, returning a Maybe
   // of the sub-parser's result.
   return Optional_<SubParser>(kj::fwd<SubParser>(subParser));
@@ -560,7 +560,7 @@ class OneOf_;
 template <typename FirstSubParser, typename... SubParsers>
 class OneOf_<FirstSubParser, SubParsers...> {
 public:
-  explicit constexpr OneOf_(FirstSubParser&& firstSubParser, SubParsers&&... rest)
+  explicit KJ_CONSTEXPR OneOf_(FirstSubParser&& firstSubParser, SubParsers&&... rest)
       : first(kj::fwd<FirstSubParser>(firstSubParser)), rest(kj::fwd<SubParsers>(rest)...) {}
 
   template <typename Input>
@@ -594,7 +594,7 @@ public:
 };
 
 template <typename... SubParsers>
-constexpr OneOf_<SubParsers...> oneOf(SubParsers&&... parsers) {
+KJ_CONSTEXPR OneOf_<SubParsers...> oneOf(SubParsers&&... parsers) {
   // Constructs a parser that accepts one of a set of options.  The parser behaves as the first
   // sub-parser in the list which returns successfully.  All of the sub-parsers must return the
   // same type.
@@ -613,7 +613,7 @@ public:
   inline const Position& end() const { return end_; }
 
   Span() = default;
-  inline constexpr Span(Position&& begin, Position&& end): begin_(mv(begin)), end_(mv(end)) {}
+  inline KJ_CONSTEXPR Span(Position&& begin, Position&& end): begin_(mv(begin)), end_(mv(end)) {}
 
 private:
   Position begin_;
@@ -621,14 +621,14 @@ private:
 };
 
 template <typename Position>
-constexpr Span<Decay<Position>> span(Position&& start, Position&& end) {
+KJ_CONSTEXPR Span<Decay<Position>> span(Position&& start, Position&& end) {
   return Span<Decay<Position>>(kj::fwd<Position>(start), kj::fwd<Position>(end));
 }
 
 template <typename SubParser, typename TransformFunc>
 class Transform_ {
 public:
-  explicit constexpr Transform_(SubParser&& subParser, TransformFunc&& transform)
+  explicit KJ_CONSTEXPR Transform_(SubParser&& subParser, TransformFunc&& transform)
       : subParser(kj::fwd<SubParser>(subParser)), transform(kj::fwd<TransformFunc>(transform)) {}
 
   template <typename Input>
@@ -650,7 +650,7 @@ private:
 template <typename SubParser, typename TransformFunc>
 class TransformOrReject_ {
 public:
-  explicit constexpr TransformOrReject_(SubParser&& subParser, TransformFunc&& transform)
+  explicit KJ_CONSTEXPR TransformOrReject_(SubParser&& subParser, TransformFunc&& transform)
       : subParser(kj::fwd<SubParser>(subParser)), transform(kj::fwd<TransformFunc>(transform)) {}
 
   template <typename Input>
@@ -671,7 +671,7 @@ private:
 template <typename SubParser, typename TransformFunc>
 class TransformWithLocation_ {
 public:
-  explicit constexpr TransformWithLocation_(SubParser&& subParser, TransformFunc&& transform)
+  explicit KJ_CONSTEXPR TransformWithLocation_(SubParser&& subParser, TransformFunc&& transform)
       : subParser(kj::fwd<SubParser>(subParser)), transform(kj::fwd<TransformFunc>(transform)) {}
 
   template <typename Input>
@@ -694,7 +694,7 @@ private:
 };
 
 template <typename SubParser, typename TransformFunc>
-constexpr Transform_<SubParser, TransformFunc> transform(
+KJ_CONSTEXPR Transform_<SubParser, TransformFunc> transform(
     SubParser&& subParser, TransformFunc&& functor) {
   // Constructs a parser which executes some other parser and then transforms the result by invoking
   // `functor` on it.  Typically `functor` is a lambda.  It is invoked using `kj::apply`,
@@ -704,7 +704,7 @@ constexpr Transform_<SubParser, TransformFunc> transform(
 }
 
 template <typename SubParser, typename TransformFunc>
-constexpr TransformOrReject_<SubParser, TransformFunc> transformOrReject(
+KJ_CONSTEXPR TransformOrReject_<SubParser, TransformFunc> transformOrReject(
     SubParser&& subParser, TransformFunc&& functor) {
   // Like `transform()` except that `functor` returns a `Maybe`.  If it returns null, parsing fails,
   // otherwise the parser's result is the content of the `Maybe`.
@@ -713,7 +713,7 @@ constexpr TransformOrReject_<SubParser, TransformFunc> transformOrReject(
 }
 
 template <typename SubParser, typename TransformFunc>
-constexpr TransformWithLocation_<SubParser, TransformFunc> transformWithLocation(
+KJ_CONSTEXPR TransformWithLocation_<SubParser, TransformFunc> transformWithLocation(
     SubParser&& subParser, TransformFunc&& functor) {
   // Like `transform` except that `functor` also takes a `Span` as its first parameter specifying
   // the location of the parsed content.  The span's position type is whatever the parser input's
@@ -729,7 +729,7 @@ constexpr TransformWithLocation_<SubParser, TransformFunc> transformWithLocation
 template <typename SubParser>
 class NotLookingAt_ {
 public:
-  explicit constexpr NotLookingAt_(SubParser&& subParser)
+  explicit KJ_CONSTEXPR NotLookingAt_(SubParser&& subParser)
       : subParser(kj::fwd<SubParser>(subParser)) {}
 
   template <typename Input>
@@ -748,7 +748,7 @@ private:
 };
 
 template <typename SubParser>
-constexpr NotLookingAt_<SubParser> notLookingAt(SubParser&& subParser) {
+KJ_CONSTEXPR NotLookingAt_<SubParser> notLookingAt(SubParser&& subParser) {
   // Constructs a parser which fails at any position where the given parser succeeds.  Otherwise,
   // it succeeds without consuming any input and returns an empty tuple.
   return NotLookingAt_<SubParser>(kj::fwd<SubParser>(subParser));
@@ -770,7 +770,7 @@ public:
   }
 };
 
-constexpr EndOfInput_ endOfInput = EndOfInput_();
+KJ_CONSTEXPR EndOfInput_ endOfInput = EndOfInput_();
 // A parser that succeeds only if it is called with no input.
 
 }  // namespace parse

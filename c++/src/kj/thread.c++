@@ -39,7 +39,7 @@ Thread::Thread(Function<void()> func): func(kj::mv(func)) {
   }
 }
 
-Thread::~Thread() noexcept(false) {
+Thread::~Thread() KJ_NOEXCEPT_FALSE {
   if (!detached) {
     int pthreadResult = pthread_join(*reinterpret_cast<pthread_t*>(&threadId), nullptr);
     if (pthreadResult != 0) {

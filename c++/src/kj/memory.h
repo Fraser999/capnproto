@@ -112,20 +112,20 @@ class Own {
 public:
   KJ_DISALLOW_COPY(Own);
   inline Own(): disposer(nullptr), ptr(nullptr) {}
-  inline Own(Own&& other) noexcept
+  inline Own(Own&& other) KJ_NOEXCEPT
       : disposer(other.disposer), ptr(other.ptr) { other.ptr = nullptr; }
-  inline Own(Own<RemoveConstOrDisable<T>>&& other) noexcept
+  inline Own(Own<RemoveConstOrDisable<T>>&& other) KJ_NOEXCEPT
       : disposer(other.disposer), ptr(other.ptr) { other.ptr = nullptr; }
   template <typename U, typename = EnableIf<canConvert<U*, T*>()>>
-  inline Own(Own<U>&& other) noexcept
+  inline Own(Own<U>&& other) KJ_NOEXCEPT
       : disposer(other.disposer), ptr(other.ptr) {
     static_assert(__is_polymorphic(T),
         "Casting owned pointers requires that the target type is polymorphic.");
     other.ptr = nullptr;
   }
-  inline Own(T* ptr, const Disposer& disposer) noexcept: disposer(&disposer), ptr(ptr) {}
+  inline Own(T* ptr, const Disposer& disposer) KJ_NOEXCEPT: disposer(&disposer), ptr(ptr) {}
 
-  ~Own() noexcept(false) { dispose(); }
+  ~Own() KJ_NOEXCEPT_FALSE { dispose(); }
 
   inline Own& operator=(Own&& other) {
     // Move-assingnment operator.
@@ -202,7 +202,7 @@ namespace _ {  // private
 template <typename T>
 class OwnOwn {
 public:
-  inline OwnOwn(Own<T>&& value) noexcept: value(kj::mv(value)) {}
+  inline OwnOwn(Own<T>&& value) KJ_NOEXCEPT: value(kj::mv(value)) {}
 
   inline Own<T>& operator*() { return value; }
   inline const Own<T>& operator*() const { return value; }
@@ -228,13 +228,13 @@ template <typename T>
 class Maybe<Own<T>> {
 public:
   inline Maybe(): ptr(nullptr) {}
-  inline Maybe(Own<T>&& t) noexcept: ptr(kj::mv(t)) {}
-  inline Maybe(Maybe&& other) noexcept: ptr(kj::mv(other.ptr)) {}
+  inline Maybe(Own<T>&& t) KJ_NOEXCEPT: ptr(kj::mv(t)) {}
+  inline Maybe(Maybe&& other) KJ_NOEXCEPT: ptr(kj::mv(other.ptr)) {}
 
   template <typename U>
   inline Maybe(Maybe<Own<U>>&& other): ptr(mv(other.ptr)) {}
 
-  inline Maybe(decltype(nullptr)) noexcept: ptr(nullptr) {}
+  inline Maybe(decltype(nullptr)) KJ_NOEXCEPT: ptr(nullptr) {}
 
   inline operator Maybe<T&>() { return ptr.get(); }
   inline operator Maybe<const T&>() const { return ptr.get(); }

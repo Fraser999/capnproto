@@ -175,7 +175,7 @@ private:
 
 class Arena {
 public:
-  virtual ~Arena() noexcept(false);
+  virtual ~Arena() KJ_NOEXCEPT_FALSE;
 
   virtual SegmentReader* tryGetSegment(SegmentId id) = 0;
   // Gets the segment with the given ID, or return nullptr if no such segment exists.
@@ -192,7 +192,7 @@ public:
 class ReaderArena final: public Arena {
 public:
   ReaderArena(MessageReader* message);
-  ~ReaderArena() noexcept(false);
+  ~ReaderArena() KJ_NOEXCEPT_FALSE;
   KJ_DISALLOW_COPY(ReaderArena);
 
   inline void initCapTable(kj::Array<kj::Maybe<kj::Own<ClientHook>>> capTable) {
@@ -231,7 +231,7 @@ class BuilderArena final: public Arena {
 
 public:
   BuilderArena(MessageBuilder* message);
-  ~BuilderArena() noexcept(false);
+  ~BuilderArena() KJ_NOEXCEPT_FALSE;
   KJ_DISALLOW_COPY(BuilderArena);
 
   inline SegmentBuilder* getRootSegment() { return &segment0; }

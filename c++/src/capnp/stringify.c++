@@ -79,8 +79,8 @@ private:
 
   explicit Indent(uint amount): amount(amount) {}
 
-  static constexpr size_t maxInlineValueSize = 24;
-  static constexpr size_t maxInlineRecordSize = 64;
+  static KJ_CONSTEXPR size_t maxInlineValueSize = 24;
+  static KJ_CONSTEXPR size_t maxInlineRecordSize = 64;
 
   static bool canPrintInline(const kj::StringTree& text) {
     if (text.size() > maxInlineValueSize) {

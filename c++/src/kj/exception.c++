@@ -177,7 +177,7 @@ String KJ_STRINGIFY(const Exception& e) {
 }
 
 Exception::Exception(Nature nature, Durability durability, const char* file, int line,
-                     String description) noexcept
+                     String description) KJ_NOEXCEPT
     : file(file), line(line), nature(nature), durability(durability),
       description(mv(description)) {
 #ifndef KJ_HAS_BACKTRACE
@@ -188,7 +188,7 @@ Exception::Exception(Nature nature, Durability durability, const char* file, int
 }
 
 Exception::Exception(Nature nature, Durability durability, String file, int line,
-                     String description) noexcept
+                     String description) KJ_NOEXCEPT
     : ownFile(kj::mv(file)), file(ownFile.cStr()), line(line), nature(nature),
       durability(durability), description(mv(description)) {
 #ifndef KJ_HAS_BACKTRACE
@@ -198,7 +198,7 @@ Exception::Exception(Nature nature, Durability durability, String file, int line
 #endif
 }
 
-Exception::Exception(const Exception& other) noexcept
+Exception::Exception(const Exception& other) KJ_NOEXCEPT
     : file(other.file), line(other.line), nature(other.nature), durability(other.durability),
       description(heapString(other.description)), traceCount(other.traceCount) {
   if (file == other.ownFile.cStr()) {
@@ -213,9 +213,9 @@ Exception::Exception(const Exception& other) noexcept
   }
 }
 
-Exception::~Exception() noexcept {}
+Exception::~Exception() KJ_NOEXCEPT {}
 
-Exception::Context::Context(const Context& other) noexcept
+Exception::Context::Context(const Context& other) KJ_NOEXCEPT
     : file(other.file), line(other.line), description(str(other.description)) {
   KJ_IF_MAYBE(n, other.next) {
     next = heap(**n);
@@ -233,13 +233,13 @@ public:
     // No need to copy whatBuffer since it's just to hold the return value of what().
   }
 
-  const char* what() const noexcept override;
+  const char* what() const KJ_NOEXCEPT override;
 
 private:
   mutable String whatBuffer;
 };
 
-const char* ExceptionImpl::what() const noexcept {
+const char* ExceptionImpl::what() const KJ_NOEXCEPT {
   whatBuffer = str(*this);
   return whatBuffer.begin();
 }
@@ -263,7 +263,7 @@ ExceptionCallback::ExceptionCallback(): next(getExceptionCallback()) {
 
 ExceptionCallback::ExceptionCallback(ExceptionCallback& next): next(next) {}
 
-ExceptionCallback::~ExceptionCallback() noexcept(false) {
+ExceptionCallback::~ExceptionCallback() KJ_NOEXCEPT_FALSE {
   if (&next != this) {
     threadLocalCallback = &next;
   }
@@ -418,7 +418,7 @@ class RecoverableExceptionCatcher: public ExceptionCallback {
   // -fno-exceptions.
 
 public:
-  virtual ~RecoverableExceptionCatcher() noexcept(false) {}
+  virtual ~RecoverableExceptionCatcher() KJ_NOEXCEPT_FALSE {}
 
   void onRecoverableException(Exception&& exception) override {
     if (caught == nullptr) {
@@ -431,7 +431,7 @@ public:
   Maybe<Exception> caught;
 };
 
-Maybe<Exception> runCatchingExceptions(Runnable& runnable) noexcept {
+Maybe<Exception> runCatchingExceptions(Runnable& runnable) KJ_NOEXCEPT {
 #if KJ_NO_EXCEPTIONS
   RecoverableExceptionCatcher catcher;
   runnable.run();

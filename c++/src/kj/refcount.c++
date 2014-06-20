@@ -27,7 +27,7 @@
 
 namespace kj {
 
-Refcounted::~Refcounted() noexcept(false) {
+Refcounted::~Refcounted() KJ_NOEXCEPT_FALSE {
   KJ_ASSERT(refcount == 0, "Refcounted object deleted with non-zero refcount.");
 }
 

@@ -111,25 +111,25 @@ void attachDocComment(Statement::Builder statement, kj::Array<kj::String>&& comm
   KJ_ASSERT(pos == builder.end());
 }
 
-constexpr auto discardComment =
+KJ_CONSTEXPR auto discardComment =
     sequence(p::exactChar<'#'>(), p::discard(p::many(p::discard(p::anyOfChars("\n").invert()))),
              p::oneOf(p::exactChar<'\n'>(), p::endOfInput));
-constexpr auto saveComment =
+KJ_CONSTEXPR auto saveComment =
     sequence(p::exactChar<'#'>(), p::discard(p::optional(p::exactChar<' '>())),
              p::charsToString(p::many(p::anyOfChars("\n").invert())),
              p::oneOf(p::exactChar<'\n'>(), p::endOfInput));
 
-constexpr auto commentsAndWhitespace =
+KJ_CONSTEXPR auto commentsAndWhitespace =
     sequence(p::discardWhitespace,
              p::discard(p::many(sequence(discardComment, p::discardWhitespace))));
 
-constexpr auto discardLineWhitespace =
+KJ_CONSTEXPR auto discardLineWhitespace =
     p::discard(p::many(p::discard(p::whitespaceChar.invert().orAny("\r\n").invert())));
-constexpr auto newline = p::oneOf(
+KJ_CONSTEXPR auto newline = p::oneOf(
     p::exactChar<'\n'>(),
     sequence(p::exactChar<'\r'>(), p::discard(p::optional(p::exactChar<'\n'>()))));
 
-constexpr auto docComment = p::optional(p::sequence(
+KJ_CONSTEXPR auto docComment = p::optional(p::sequence(
     discardLineWhitespace,
     p::discard(p::optional(newline)),
     p::oneOrMore(p::sequence(discardLineWhitespace, saveComment))));
@@ -269,7 +269,7 @@ Lexer::Lexer(Orphanage orphanageParam, ErrorReporter& errorReporterParam)
   parsers.emptySpace = commentsAndWhitespace;
 }
 
-Lexer::~Lexer() noexcept(false) {}
+Lexer::~Lexer() KJ_NOEXCEPT_FALSE {}
 
 }  // namespace compiler
 }  // namespace capnp

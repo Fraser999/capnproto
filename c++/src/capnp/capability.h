@@ -330,7 +330,7 @@ class ResponseHook {
   // ResponseHook is destroyed, the results can be freed.
 
 public:
-  virtual ~ResponseHook() noexcept(false);
+  virtual ~ResponseHook() KJ_NOEXCEPT_FALSE;
   // Just here to make sure the type is dynamic.
 };
 

@@ -111,7 +111,7 @@ public:
   explicit EzRpcClient(int socketFd);
   // Create a client on top of an already-connected socket.
 
-  ~EzRpcClient() noexcept(false);
+  ~EzRpcClient() KJ_NOEXCEPT_FALSE;
 
   template <typename Type>
   typename Type::Client importCap(kj::StringPtr name);
@@ -163,7 +163,7 @@ public:
   // Create a server on top of an already-listening socket (i.e. one on which accept() may be
   // called).  `port` is returned by `getPort()` -- it serves no other purpose.
 
-  ~EzRpcServer() noexcept(false);
+  ~EzRpcServer() KJ_NOEXCEPT_FALSE;
 
   void exportCap(kj::StringPtr name, Capability::Client cap);
   // Export a capability publicly under the given name, so that clients can import it.

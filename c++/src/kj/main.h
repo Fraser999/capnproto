@@ -246,7 +246,7 @@ class MainBuilder {
 public:
   MainBuilder(ProcessContext& context, StringPtr version,
               StringPtr briefDescription, StringPtr extendedDescription = nullptr);
-  ~MainBuilder() noexcept(false);
+  ~MainBuilder() KJ_NOEXCEPT_FALSE;
 
   class OptionName {
   public:

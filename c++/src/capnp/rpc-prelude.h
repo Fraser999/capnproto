@@ -72,8 +72,8 @@ public:
 class RpcSystemBase {
 public:
   RpcSystemBase(VatNetworkBase& network, kj::Maybe<SturdyRefRestorerBase&> restorer);
-  RpcSystemBase(RpcSystemBase&& other) noexcept;
-  ~RpcSystemBase() noexcept(false);
+  RpcSystemBase(RpcSystemBase&& other) KJ_NOEXCEPT;
+  ~RpcSystemBase() KJ_NOEXCEPT_FALSE;
 
 private:
   class Impl;

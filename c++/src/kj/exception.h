@@ -71,12 +71,12 @@ public:
   };
 
   Exception(Nature nature, Durability durability, const char* file, int line,
-            String description = nullptr) noexcept;
+            String description = nullptr) KJ_NOEXCEPT;
   Exception(Nature nature, Durability durability, String file, int line,
-            String description = nullptr) noexcept;
-  Exception(const Exception& other) noexcept;
+            String description = nullptr) KJ_NOEXCEPT;
+  Exception(const Exception& other) KJ_NOEXCEPT;
   Exception(Exception&& other) = default;
-  ~Exception() noexcept;
+  ~Exception() KJ_NOEXCEPT;
 
   const char* getFile() const { return file; }
   int getLine() const { return line; }
@@ -95,7 +95,7 @@ public:
 
     Context(const char* file, int line, String&& description, Maybe<Own<Context>>&& next)
         : file(file), line(line), description(mv(description)), next(mv(next)) {}
-    Context(const Context& other) noexcept;
+    Context(const Context& other) KJ_NOEXCEPT;
   };
 
   inline Maybe<const Context&> getContext() const {
@@ -148,7 +148,7 @@ class ExceptionCallback {
 public:
   ExceptionCallback();
   KJ_DISALLOW_COPY(ExceptionCallback);
-  virtual ~ExceptionCallback() noexcept(false);
+  virtual ~ExceptionCallback() KJ_NOEXCEPT_FALSE;
 
   virtual void onRecoverableException(Exception&& exception);
   // Called when an exception has been raised, but the calling code has the ability to continue by
@@ -186,7 +186,7 @@ private:
 ExceptionCallback& getExceptionCallback();
 // Returns the current exception callback.
 
-void throwFatalException(kj::Exception&& exception) KJ_NORETURN;
+void KJ_NORETURN throwFatalException(kj::Exception&& exception);
 // Invoke the exception callback to throw the given fatal exception.  If the exception callback
 // returns, abort.
 
@@ -199,7 +199,7 @@ void throwRecoverableException(kj::Exception&& exception);
 namespace _ { class Runnable; }
 
 template <typename Func>
-Maybe<Exception> runCatchingExceptions(Func&& func) noexcept;
+Maybe<Exception> runCatchingExceptions(Func&& func) KJ_NOEXCEPT;
 // Executes the given function (usually, a lambda returning nothing) catching any exceptions that
 // are thrown.  Returns the Exception if there was one, or null if the operation completed normally.
 // Non-KJ exceptions will be wrapped.
@@ -254,12 +254,12 @@ private:
   Func func;
 };
 
-Maybe<Exception> runCatchingExceptions(Runnable& runnable) noexcept;
+Maybe<Exception> runCatchingExceptions(Runnable& runnable) KJ_NOEXCEPT;
 
 }  // namespace _ (private)
 
 template <typename Func>
-Maybe<Exception> runCatchingExceptions(Func&& func) noexcept {
+Maybe<Exception> runCatchingExceptions(Func&& func) KJ_NOEXCEPT {
   _::RunnableImpl<Decay<Func>> runnable(kj::fwd<Func>(func));
   return _::runCatchingExceptions(runnable);
 }

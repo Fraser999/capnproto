@@ -102,7 +102,7 @@ kj::Promise<void> Capability::Server::internalUnimplemented(
   return kj::READY_NOW;
 }
 
-ResponseHook::~ResponseHook() noexcept(false) {}
+ResponseHook::~ResponseHook() KJ_NOEXCEPT_FALSE {}
 
 kj::Promise<void> ClientHook::whenResolved() {
   KJ_IF_MAYBE(promise, whenMoreResolved()) {

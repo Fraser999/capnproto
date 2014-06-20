@@ -164,7 +164,7 @@ public:
     dumper.addSchema(Schema::from<test::TestTailCaller>());
     dumper.addSchema(Schema::from<test::TestMoreStuff>());
   }
-  ~TestNetwork() noexcept(false);
+  ~TestNetwork() KJ_NOEXCEPT_FALSE;
 
   TestNetworkAdapter& add(kj::StringPtr name);
 
@@ -395,7 +395,7 @@ private:
   std::queue<kj::Own<Connection>> connectionQueue;
 };
 
-TestNetwork::~TestNetwork() noexcept(false) {}
+TestNetwork::~TestNetwork() KJ_NOEXCEPT_FALSE {}
 
 TestNetworkAdapter& TestNetwork::add(kj::StringPtr name) {
   return *(map[name] = kj::heap<TestNetworkAdapter>(*this));

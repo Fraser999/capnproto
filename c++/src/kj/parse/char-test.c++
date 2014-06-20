@@ -33,7 +33,7 @@ typedef IteratorInput<char, const char*> Input;
 typedef Span<const char*> TestLocation;
 
 TEST(CharParsers, ExactChar) {
-  constexpr auto parser = exactChar<'a'>();
+  KJ_CONSTEXPR auto parser = exactChar<'a'>();
 
   {
     StringPtr text = "a";
@@ -51,7 +51,7 @@ TEST(CharParsers, ExactChar) {
 }
 
 TEST(CharParsers, ExactString) {
-  constexpr auto parser = exactString("foo");
+  KJ_CONSTEXPR auto parser = exactString("foo");
 
   {
     StringPtr text = "foobar";
@@ -71,7 +71,7 @@ TEST(CharParsers, ExactString) {
 }
 
 TEST(CharParsers, CharRange) {
-  constexpr auto parser = charRange('a', 'z');
+  KJ_CONSTEXPR auto parser = charRange('a', 'z');
 
   {
     StringPtr text = "a";
@@ -135,7 +135,7 @@ TEST(CharParsers, CharRange) {
 }
 
 TEST(CharParsers, AnyOfChars) {
-  constexpr auto parser = anyOfChars("axn2B");
+  KJ_CONSTEXPR auto parser = anyOfChars("axn2B");
 
   {
     StringPtr text = "a";
@@ -199,7 +199,7 @@ TEST(CharParsers, AnyOfChars) {
 }
 
 TEST(CharParsers, CharGroupCombo) {
-  constexpr auto parser =
+  KJ_CONSTEXPR auto parser =
       many(charRange('0', '9').orRange('a', 'z').orRange('A', 'Z').orAny("-_"));
 
   {
@@ -216,7 +216,7 @@ TEST(CharParsers, CharGroupCombo) {
 }
 
 TEST(CharParsers, Identifier) {
-  constexpr auto parser = identifier;
+  KJ_CONSTEXPR auto parser = identifier;
 
   {
     StringPtr text = "helloWorld123 ";
@@ -232,7 +232,7 @@ TEST(CharParsers, Identifier) {
 }
 
 TEST(CharParsers, Integer) {
-  constexpr auto parser = integer;
+  KJ_CONSTEXPR auto parser = integer;
 
   {
     StringPtr text = "12349";
@@ -272,7 +272,7 @@ TEST(CharParsers, Integer) {
 }
 
 TEST(CharParsers, Number) {
-  constexpr auto parser = number;
+  KJ_CONSTEXPR auto parser = number;
 
   {
     StringPtr text = "12345";
@@ -336,7 +336,7 @@ TEST(CharParsers, Number) {
 }
 
 TEST(CharParsers, DoubleQuotedString) {
-  constexpr auto parser = doubleQuotedString;
+  KJ_CONSTEXPR auto parser = doubleQuotedString;
 
   {
     StringPtr text = "\"hello\"";
@@ -376,7 +376,7 @@ TEST(CharParsers, DoubleQuotedString) {
 }
 
 TEST(CharParsers, SingleQuotedString) {
-  constexpr auto parser = singleQuotedString;
+  KJ_CONSTEXPR auto parser = singleQuotedString;
 
   {
     StringPtr text = "\'hello\'";

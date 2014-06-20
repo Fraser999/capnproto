@@ -31,16 +31,16 @@ namespace kj {
 namespace _ {  // private
 
 template <uint i, typename Key, typename First, typename... Rest>
-struct TypeIndex_ { static constexpr uint value = TypeIndex_<i + 1, Key, Rest...>::value; };
+struct TypeIndex_ { static KJ_CONSTEXPR uint value = TypeIndex_<i + 1, Key, Rest...>::value; };
 template <uint i, typename Key, typename... Rest>
-struct TypeIndex_<i, Key, Key, Rest...> { static constexpr uint value = i; };
+struct TypeIndex_<i, Key, Key, Rest...> { static KJ_CONSTEXPR uint value = i; };
 
 }  // namespace _ (private)
 
 template <typename... Variants>
 class OneOf {
   template <typename Key>
-  static inline constexpr uint typeIndex() { return _::TypeIndex_<1, Key, Variants...>::value; }
+  static inline KJ_CONSTEXPR uint typeIndex() { return _::TypeIndex_<1, Key, Variants...>::value; }
   // Get the 1-based index of Key within the type list Types.
 
 public:
@@ -81,11 +81,11 @@ public:
 private:
   uint tag;
 
-  static inline constexpr size_t maxSize(size_t a) {
+  static inline KJ_CONSTEXPR size_t maxSize(size_t a) {
     return a;
   }
   template <typename... Rest>
-  static inline constexpr size_t maxSize(size_t a, size_t b, Rest... rest) {
+  static inline KJ_CONSTEXPR size_t maxSize(size_t a, size_t b, Rest... rest) {
     return maxSize(kj::max(a, b), rest...);
   }
   // Returns the maximum of all the parameters.

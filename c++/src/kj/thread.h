@@ -38,7 +38,7 @@ class Thread {
 public:
   explicit Thread(Function<void()> func);
 
-  ~Thread() noexcept(false);
+  ~Thread() KJ_NOEXCEPT_FALSE;
 
   void sendSignal(int signo);
   // Send a Unix signal to the given thread, using pthread_kill or an equivalent.

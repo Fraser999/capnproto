@@ -50,7 +50,7 @@ protected:
   }
 };
 
-constexpr MmapDisposer mmapDisposer = MmapDisposer();
+KJ_CONSTEXPR MmapDisposer mmapDisposer = MmapDisposer();
 
 kj::Array<const char> mmapForRead(kj::StringPtr filename) {
   int fd;
@@ -313,7 +313,7 @@ kj::Maybe<Module&> ModuleLoader::Impl::loadModuleFromSearchPath(kj::StringPtr so
 
 ModuleLoader::ModuleLoader(GlobalErrorReporter& errorReporter)
     : impl(kj::heap<Impl>(errorReporter)) {}
-ModuleLoader::~ModuleLoader() noexcept(false) {}
+ModuleLoader::~ModuleLoader() KJ_NOEXCEPT_FALSE {}
 
 void ModuleLoader::addImportPath(kj::String path) { impl->addImportPath(kj::mv(path)); }
 

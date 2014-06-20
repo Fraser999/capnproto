@@ -63,7 +63,7 @@ public:
   // `orphanage` is used to allocate Cap'n Proto message objects in the result.  `inputStart` is
   // a pointer to the beginning of the input, used to compute byte offsets.
 
-  ~CapnpParser() noexcept(false);
+  ~CapnpParser() KJ_NOEXCEPT_FALSE;
 
   KJ_DISALLOW_COPY(CapnpParser);
 

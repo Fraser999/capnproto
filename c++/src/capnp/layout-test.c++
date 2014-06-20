@@ -102,7 +102,7 @@ static const AlignedData<2> SUBSTRUCT_DEFAULT = {{0,0,0,0,1,0,0,0,  0,0,0,0,0,0,
 static const AlignedData<2> STRUCTLIST_ELEMENT_SUBSTRUCT_DEFAULT =
     {{0,0,0,0,1,0,0,0,  0,0,0,0,0,0,0,0}};
 
-static constexpr StructSize STRUCTLIST_ELEMENT_SIZE(
+static KJ_CONSTEXPR StructSize STRUCTLIST_ELEMENT_SIZE(
     1 * WORDS, 1 * POINTERS, FieldSize::INLINE_COMPOSITE);
 
 static void setupStruct(StructBuilder builder) {

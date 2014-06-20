@@ -91,6 +91,8 @@ set(KjSources
 
 add_library(kj ${IncludeKjHeaders} ${IncludeKjParseHeaders} ${KjSources})
 
+target_compile_definitions(kj PUBLIC $<$<BOOL:${MSVC}>:KJ_NO_COMPILER_CHECK>)
+
 target_compile_options(kj PUBLIC $<$<BOOL:${UNIX}>:-std=c++11>)
 
 target_include_directories(kj PUBLIC c++ c++/src)

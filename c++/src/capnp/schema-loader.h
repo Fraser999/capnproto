@@ -64,7 +64,7 @@ public:
   // Construct a SchemaLoader which will invoke the given callback when a schema node is requested
   // that isn't already loaded.
 
-  ~SchemaLoader() noexcept(false);
+  ~SchemaLoader() KJ_NOEXCEPT_FALSE;
   KJ_DISALLOW_COPY(SchemaLoader);
 
   Schema get(uint64_t id) const;

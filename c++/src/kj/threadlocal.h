@@ -79,7 +79,7 @@ class ThreadLocalPtr {
 
 public:
   ThreadLocalPtr() = default;
-  constexpr ThreadLocalPtr(decltype(nullptr)) {}
+  KJ_CONSTEXPR ThreadLocalPtr(decltype(nullptr)) {}
   // Allow initialization to nullptr without a global constructor.
 
   inline ThreadLocalPtr& operator=(T* val) {

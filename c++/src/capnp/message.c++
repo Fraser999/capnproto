@@ -36,7 +36,7 @@
 namespace capnp {
 
 MessageReader::MessageReader(ReaderOptions options): options(options), allocatedArena(false) {}
-MessageReader::~MessageReader() noexcept(false) {
+MessageReader::~MessageReader() KJ_NOEXCEPT_FALSE {
   if (allocatedArena) {
     arena()->~ReaderArena();
   }
@@ -65,7 +65,7 @@ AnyPointer::Reader MessageReader::getRootInternal() {
 // -------------------------------------------------------------------
 
 MessageBuilder::MessageBuilder(): allocatedArena(false) {}
-MessageBuilder::~MessageBuilder() noexcept(false) {
+MessageBuilder::~MessageBuilder() KJ_NOEXCEPT_FALSE {
   if (allocatedArena) {
     kj::dtor(*arena());
   }
@@ -126,7 +126,7 @@ SegmentArrayMessageReader::SegmentArrayMessageReader(
     kj::ArrayPtr<const kj::ArrayPtr<const word>> segments, ReaderOptions options)
     : MessageReader(options), segments(segments) {}
 
-SegmentArrayMessageReader::~SegmentArrayMessageReader() noexcept(false) {}
+SegmentArrayMessageReader::~SegmentArrayMessageReader() KJ_NOEXCEPT_FALSE {}
 
 kj::ArrayPtr<const word> SegmentArrayMessageReader::getSegment(uint id) {
   if (id < segments.size()) {
@@ -158,7 +158,7 @@ MallocMessageBuilder::MallocMessageBuilder(
           "First segment must be zeroed.");
 }
 
-MallocMessageBuilder::~MallocMessageBuilder() noexcept(false) {
+MallocMessageBuilder::~MallocMessageBuilder() KJ_NOEXCEPT_FALSE {
   if (returnedFirstSegment) {
     if (ownFirstSegment) {
       free(firstSegment);
@@ -225,7 +225,7 @@ kj::ArrayPtr<word> MallocMessageBuilder::allocateSegment(uint minimumSize) {
 // -------------------------------------------------------------------
 
 FlatMessageBuilder::FlatMessageBuilder(kj::ArrayPtr<word> array): array(array), allocated(false) {}
-FlatMessageBuilder::~FlatMessageBuilder() noexcept(false) {}
+FlatMessageBuilder::~FlatMessageBuilder() KJ_NOEXCEPT_FALSE {}
 
 void FlatMessageBuilder::requireFilled() {
   KJ_REQUIRE(getSegmentsForOutput()[0].end() == array.end(),

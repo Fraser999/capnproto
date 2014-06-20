@@ -242,7 +242,7 @@ private:
 class Compiler::Impl: public SchemaLoader::LazyLoadCallback {
 public:
   explicit Impl(AnnotationFlag annotationFlag);
-  virtual ~Impl() noexcept(false);
+  virtual ~Impl() KJ_NOEXCEPT_FALSE;
 
   uint64_t add(Module& module);
   kj::Maybe<uint64_t> lookup(uint64_t parent, kj::StringPtr childName);
@@ -1005,7 +1005,7 @@ Compiler::Impl::Impl(AnnotationFlag annotationFlag)
   }
 }
 
-Compiler::Impl::~Impl() noexcept(false) {}
+Compiler::Impl::~Impl() KJ_NOEXCEPT_FALSE {}
 
 void Compiler::Impl::clearWorkspace() {
   // Make sure we reconstruct the workspace even if destroying it throws an exception.
@@ -1114,7 +1114,7 @@ void Compiler::Impl::loadFinal(const SchemaLoader& loader, uint64_t id) {
 Compiler::Compiler(AnnotationFlag annotationFlag)
     : impl(kj::heap<Impl>(annotationFlag)),
       loader(*this) {}
-Compiler::~Compiler() noexcept(false) {}
+Compiler::~Compiler() KJ_NOEXCEPT_FALSE {}
 
 uint64_t Compiler::add(Module& module) const {
   return impl.lockExclusive()->get()->add(module);

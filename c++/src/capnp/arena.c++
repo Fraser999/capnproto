@@ -34,7 +34,7 @@
 namespace capnp {
 namespace _ {  // private
 
-Arena::~Arena() noexcept(false) {}
+Arena::~Arena() KJ_NOEXCEPT_FALSE {}
 
 void ReadLimiter::unread(WordCount64 amount) {
   // Be careful not to overflow here.  Since ReadLimiter has no thread-safety, it's possible that
@@ -61,7 +61,7 @@ ReaderArena::ReaderArena(MessageReader* message)
       readLimiter(message->getOptions().traversalLimitInWords * WORDS),
       segment0(this, SegmentId(0), message->getSegment(0), &readLimiter) {}
 
-ReaderArena::~ReaderArena() noexcept(false) {}
+ReaderArena::~ReaderArena() KJ_NOEXCEPT_FALSE {}
 
 SegmentReader* ReaderArena::tryGetSegment(SegmentId id) {
   if (id == SegmentId(0)) {
@@ -119,7 +119,7 @@ kj::Maybe<kj::Own<ClientHook>> ReaderArena::extractCap(uint index) {
 
 BuilderArena::BuilderArena(MessageBuilder* message)
     : message(message), segment0(nullptr, SegmentId(0), nullptr, nullptr) {}
-BuilderArena::~BuilderArena() noexcept(false) {}
+BuilderArena::~BuilderArena() KJ_NOEXCEPT_FALSE {}
 
 SegmentBuilder* BuilderArena::getSegment(SegmentId id) {
   // This method is allowed to fail if the segment ID is not valid.

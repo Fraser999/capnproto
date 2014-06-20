@@ -55,7 +55,7 @@ String StringTree::flatten() const {
   return result;
 }
 
-void StringTree::flattenTo(char* __restrict__ target) const {
+void StringTree::flattenTo(char* __restrict target) const {
   visit([&target](ArrayPtr<const char> text) {
     memcpy(target, text.begin(), text.size());
     target += text.size();

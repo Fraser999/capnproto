@@ -53,10 +53,10 @@
 namespace capnp {
 namespace {
 
-static constexpr uint64_t NAMESPACE_ANNOTATION_ID = 0xb9c6f99ebf805f2cull;
-static constexpr uint64_t NAME_ANNOTATION_ID = 0xf264a779fef191ceull;
+static KJ_CONSTEXPR uint64_t NAMESPACE_ANNOTATION_ID = 0xb9c6f99ebf805f2cull;
+static KJ_CONSTEXPR uint64_t NAME_ANNOTATION_ID = 0xf264a779fef191ceull;
 
-static constexpr const char* FIELD_SIZE_NAMES[] = {
+static KJ_CONSTEXPR const char* FIELD_SIZE_NAMES[] = {
   "VOID", "BIT", "BYTE", "TWO_BYTES", "FOUR_BYTES", "EIGHT_BYTES", "POINTER", "INLINE_COMPOSITE"
 };
 
@@ -147,7 +147,7 @@ kj::String safeIdentifier(kj::StringPtr identifier) {
 
   static const std::set<kj::StringPtr> keywords({
     "alignas", "alignof", "and", "and_eq", "asm", "auto", "bitand", "bitor", "bool", "break",
-    "case", "catch", "char", "char16_t", "char32_t", "class", "compl", "const", "constexpr",
+    "case", "catch", "char", "char16_t", "char32_t", "class", "compl", "const", "KJ_CONSTEXPR",
     "const_cast", "continue", "decltype", "default", "delete", "do", "double", "dynamic_cast",
     "else", "enum", "explicit", "export", "extern", "false", "float", "for", "friend", "goto",
     "if", "inline", "int", "long", "mutable", "namespace", "new", "noexcept", "not", "not_eq",
@@ -1478,10 +1478,10 @@ private:
       case schema::Value::ENUM:
         return ConstText {
           false,
-          kj::strTree("static constexpr ", typeName_, ' ', upperCase, " = ",
+          kj::strTree("static KJ_CONSTEXPR ", typeName_, ' ', upperCase, " = ",
               literalValue(constProto.getType(), constProto.getValue()), ";\n"),
           scope.size() == 0 ? kj::strTree() : kj::strTree(
-              "constexpr ", typeName_, ' ', scope, upperCase, ";\n")
+              "KJ_CONSTEXPR ", typeName_, ' ', scope, upperCase, ";\n")
         };
 
       case schema::Value::TEXT: {

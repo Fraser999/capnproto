@@ -168,7 +168,7 @@ struct SchemaParser::Impl {
 };
 
 SchemaParser::SchemaParser(): impl(kj::heap<Impl>()) {}
-SchemaParser::~SchemaParser() noexcept(false) {}
+SchemaParser::~SchemaParser() KJ_NOEXCEPT_FALSE {}
 
 ParsedSchema SchemaParser::parseDiskFile(
     kj::StringPtr displayName, kj::StringPtr diskPath,
@@ -227,7 +227,7 @@ protected:
   }
 };
 
-constexpr MmapDisposer mmapDisposer = MmapDisposer();
+KJ_CONSTEXPR MmapDisposer mmapDisposer = MmapDisposer();
 
 static char* canonicalizePath(char* path) {
   // Taken from some old C code of mine.

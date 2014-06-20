@@ -2392,7 +2392,7 @@ CAPNP_DEFINE_STRUCT(
 namespace capnp {
 namespace schema {
 
-constexpr  ::uint16_t Field::NO_DISCRIMINANT;
+KJ_CONSTEXPR  ::uint16_t Field::NO_DISCRIMINANT;
 
 }  // namespace
 }  // namespace

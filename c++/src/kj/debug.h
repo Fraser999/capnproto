@@ -218,9 +218,9 @@ public:
     template <typename... Params>
     Fault(const char* file, int line, Exception::Nature nature, int errorNumber,
           const char* condition, const char* macroArgs, Params&&... params);
-    ~Fault() noexcept(false);
+    ~Fault() KJ_NOEXCEPT_FALSE;
 
-    void fatal() KJ_NORETURN;
+    void KJ_NORETURN fatal();
     // Throw the exception.
 
   private:
@@ -247,7 +247,7 @@ public:
   public:
     Context();
     KJ_DISALLOW_COPY(Context);
-    virtual ~Context() noexcept(false);
+    virtual ~Context() KJ_NOEXCEPT_FALSE;
 
     struct Value {
       const char* file;

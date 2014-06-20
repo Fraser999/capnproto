@@ -66,7 +66,7 @@ void setCloseOnExec(int fd) {
   }
 }
 
-static constexpr uint NEW_FD_FLAGS =
+static KJ_CONSTEXPR uint NEW_FD_FLAGS =
 #if __linux__
     LowLevelAsyncIoProvider::ALREADY_CLOEXEC | LowLevelAsyncIoProvider::ALREADY_NONBLOCK |
 #endif
@@ -93,7 +93,7 @@ public:
     }
   }
 
-  ~OwnedFileDescriptor() noexcept(false) {
+  ~OwnedFileDescriptor() KJ_NOEXCEPT_FALSE {
     // Don't use SYSCALL() here because close() should not be repeated on EINTR.
     if ((flags & LowLevelAsyncIoProvider::TAKE_OWNERSHIP) && close(fd) < 0) {
       KJ_FAIL_SYSCALL("close", errno, fd) {
@@ -116,7 +116,7 @@ class AsyncStreamFd: public OwnedFileDescriptor, public AsyncIoStream {
 public:
   AsyncStreamFd(UnixEventPort& eventPort, int fd, uint flags)
       : OwnedFileDescriptor(fd, flags), eventPort(eventPort) {}
-  virtual ~AsyncStreamFd() noexcept(false) {}
+  virtual ~AsyncStreamFd() KJ_NOEXCEPT_FALSE {}
 
   Promise<size_t> read(void* buffer, size_t minBytes, size_t maxBytes) override {
     return tryReadInternal(buffer, minBytes, maxBytes, 0).then([=](size_t result) {

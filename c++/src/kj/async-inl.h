@@ -82,7 +82,7 @@ class Event {
 
 public:
   Event();
-  ~Event() noexcept(false);
+  ~Event() KJ_NOEXCEPT_FALSE;
   KJ_DISALLOW_COPY(Event);
 
   void armDepthFirst();
@@ -133,16 +133,16 @@ class PromiseNode {
   // internal implementation details.
 
 public:
-  virtual void onReady(Event& event) noexcept = 0;
+  virtual void onReady(Event& event) KJ_NOEXCEPT = 0;
   // Arms the given event when ready.
 
-  virtual void setSelfPointer(Own<PromiseNode>* selfPtr) noexcept;
+  virtual void setSelfPointer(Own<PromiseNode>* selfPtr) KJ_NOEXCEPT;
   // Tells the node that `selfPtr` is the pointer that owns this node, and will continue to own
   // this node until it is destroyed or setSelfPointer() is called again.  ChainPromiseNode uses
   // this to shorten redundant chains.  The default implementation does nothing; only
   // ChainPromiseNode should implement this.
 
-  virtual void get(ExceptionOrValue& output) noexcept = 0;
+  virtual void get(ExceptionOrValue& output) KJ_NOEXCEPT = 0;
   // Get the result.  `output` points to an ExceptionOr<T> into which the result will be written.
   // Can only be called once, and only after the node is ready.  Must be called directly from the
   // event loop, with no application code on the stack.
@@ -173,9 +173,9 @@ protected:
 class ImmediatePromiseNodeBase: public PromiseNode {
 public:
   ImmediatePromiseNodeBase();
-  ~ImmediatePromiseNodeBase() noexcept(false);
+  ~ImmediatePromiseNodeBase() KJ_NOEXCEPT_FALSE;
 
-  void onReady(Event& event) noexcept override;
+  void onReady(Event& event) KJ_NOEXCEPT override;
 };
 
 template <typename T>
@@ -185,7 +185,7 @@ class ImmediatePromiseNode final: public ImmediatePromiseNodeBase {
 public:
   ImmediatePromiseNode(ExceptionOr<T>&& result): result(kj::mv(result)) {}
 
-  void get(ExceptionOrValue& output) noexcept override {
+  void get(ExceptionOrValue& output) KJ_NOEXCEPT override {
     output.as<T>() = kj::mv(result);
   }
 
@@ -197,7 +197,7 @@ class ImmediateBrokenPromiseNode final: public ImmediatePromiseNodeBase {
 public:
   ImmediateBrokenPromiseNode(Exception&& exception);
 
-  void get(ExceptionOrValue& output) noexcept override;
+  void get(ExceptionOrValue& output) KJ_NOEXCEPT override;
 
 private:
   Exception exception;
@@ -209,8 +209,8 @@ class AttachmentPromiseNodeBase: public PromiseNode {
 public:
   AttachmentPromiseNodeBase(Own<PromiseNode>&& dependency);
 
-  void onReady(Event& event) noexcept override;
-  void get(ExceptionOrValue& output) noexcept override;
+  void onReady(Event& event) KJ_NOEXCEPT override;
+  void get(ExceptionOrValue& output) KJ_NOEXCEPT override;
   PromiseNode* getInnerForTrace() override;
 
 private:
@@ -232,7 +232,7 @@ public:
       : AttachmentPromiseNodeBase(kj::mv(dependency)),
         attachment(kj::mv<Attachment>(attachment)) {}
 
-  ~AttachmentPromiseNode() noexcept(false) {
+  ~AttachmentPromiseNode() KJ_NOEXCEPT_FALSE {
     // We need to make sure the dependency is deleted before we delete the attachment because the
     // dependency may be using the attachment.
     dropDependency();
@@ -248,8 +248,8 @@ class TransformPromiseNodeBase: public PromiseNode {
 public:
   TransformPromiseNodeBase(Own<PromiseNode>&& dependency);
 
-  void onReady(Event& event) noexcept override;
-  void get(ExceptionOrValue& output) noexcept override;
+  void onReady(Event& event) KJ_NOEXCEPT override;
+  void get(ExceptionOrValue& output) KJ_NOEXCEPT override;
   PromiseNode* getInnerForTrace() override;
 
 private:
@@ -274,7 +274,7 @@ public:
       : TransformPromiseNodeBase(kj::mv(dependency)),
         func(kj::fwd<Func>(func)), errorHandler(kj::fwd<ErrorFunc>(errorHandler)) {}
 
-  ~TransformPromiseNode() noexcept(false) {
+  ~TransformPromiseNode() KJ_NOEXCEPT_FALSE {
     // We need to make sure the dependency is deleted before we delete the continuations because it
     // is a common pattern for the continuations to hold ownership of objects that might be in-use
     // by the dependency.
@@ -312,13 +312,13 @@ class ForkHubBase;
 class ForkBranchBase: public PromiseNode {
 public:
   ForkBranchBase(Own<ForkHubBase>&& hub);
-  ~ForkBranchBase() noexcept(false);
+  ~ForkBranchBase() KJ_NOEXCEPT_FALSE;
 
-  void hubReady() noexcept;
+  void hubReady() KJ_NOEXCEPT;
   // Called by the hub to indicate that it is ready.
 
   // implements PromiseNode ------------------------------------------
-  void onReady(Event& event) noexcept override;
+  void onReady(Event& event) KJ_NOEXCEPT override;
   PromiseNode* getInnerForTrace() override;
 
 protected:
@@ -348,7 +348,7 @@ class ForkBranch final: public ForkBranchBase {
 public:
   ForkBranch(Own<ForkHubBase>&& hub): ForkBranchBase(kj::mv(hub)) {}
 
-  void get(ExceptionOrValue& output) noexcept override {
+  void get(ExceptionOrValue& output) KJ_NOEXCEPT override {
     ExceptionOr<T>& hubResult = getHubResultRef().template as<T>();
     KJ_IF_MAYBE(value, hubResult.value) {
       output.as<T>().value = copyOrAddRef(*value);
@@ -413,11 +413,11 @@ class ChainPromiseNode final: public PromiseNode, public Event {
 
 public:
   explicit ChainPromiseNode(Own<PromiseNode> inner);
-  ~ChainPromiseNode() noexcept(false);
+  ~ChainPromiseNode() KJ_NOEXCEPT_FALSE;
 
-  void onReady(Event& event) noexcept override;
-  void setSelfPointer(Own<PromiseNode>* selfPtr) noexcept override;
-  void get(ExceptionOrValue& output) noexcept override;
+  void onReady(Event& event) KJ_NOEXCEPT override;
+  void setSelfPointer(Own<PromiseNode>* selfPtr) KJ_NOEXCEPT override;
+  void get(ExceptionOrValue& output) KJ_NOEXCEPT override;
   PromiseNode* getInnerForTrace() override;
 
 private:
@@ -453,17 +453,17 @@ Own<PromiseNode>&& maybeChain(Own<PromiseNode>&& node, T*) {
 class ExclusiveJoinPromiseNode final: public PromiseNode {
 public:
   ExclusiveJoinPromiseNode(Own<PromiseNode> left, Own<PromiseNode> right);
-  ~ExclusiveJoinPromiseNode() noexcept(false);
+  ~ExclusiveJoinPromiseNode() KJ_NOEXCEPT_FALSE;
 
-  void onReady(Event& event) noexcept override;
-  void get(ExceptionOrValue& output) noexcept override;
+  void onReady(Event& event) KJ_NOEXCEPT override;
+  void get(ExceptionOrValue& output) KJ_NOEXCEPT override;
   PromiseNode* getInnerForTrace() override;
 
 private:
   class Branch: public Event {
   public:
     Branch(ExclusiveJoinPromiseNode& joinNode, Own<PromiseNode> dependency);
-    ~Branch() noexcept(false);
+    ~Branch() KJ_NOEXCEPT_FALSE;
 
     bool get(ExceptionOrValue& output);
     // Returns true if this is the side that finished.
@@ -487,14 +487,14 @@ class ArrayJoinPromiseNodeBase: public PromiseNode {
 public:
   ArrayJoinPromiseNodeBase(Array<Own<PromiseNode>> promises,
                            ExceptionOrValue* resultParts, size_t partSize);
-  ~ArrayJoinPromiseNodeBase() noexcept(false);
+  ~ArrayJoinPromiseNodeBase() KJ_NOEXCEPT_FALSE;
 
-  void onReady(Event& event) noexcept override final;
-  void get(ExceptionOrValue& output) noexcept override final;
+  void onReady(Event& event) KJ_NOEXCEPT override final;
+  void get(ExceptionOrValue& output) KJ_NOEXCEPT override final;
   PromiseNode* getInnerForTrace() override final;
 
 protected:
-  virtual void getNoError(ExceptionOrValue& output) noexcept = 0;
+  virtual void getNoError(ExceptionOrValue& output) KJ_NOEXCEPT = 0;
   // Called to compile the result only in the case where there were no errors.
 
 private:
@@ -505,7 +505,7 @@ private:
   public:
     Branch(ArrayJoinPromiseNodeBase& joinNode, Own<PromiseNode> dependency,
            ExceptionOrValue& output);
-    ~Branch() noexcept(false);
+    ~Branch() KJ_NOEXCEPT_FALSE;
 
     Maybe<Own<Event>> fire() override;
     _::PromiseNode* getInnerForTrace() override;
@@ -531,7 +531,7 @@ public:
         resultParts(kj::mv(resultParts)) {}
 
 protected:
-  void getNoError(ExceptionOrValue& output) noexcept override {
+  void getNoError(ExceptionOrValue& output) KJ_NOEXCEPT override {
     auto builder = heapArrayBuilder<T>(resultParts.size());
     for (auto& part: resultParts) {
       KJ_IASSERT(part.value != nullptr,
@@ -554,7 +554,7 @@ class EagerPromiseNodeBase: public PromiseNode, protected Event {
 public:
   EagerPromiseNodeBase(Own<PromiseNode>&& dependency, ExceptionOrValue& resultRef);
 
-  void onReady(Event& event) noexcept override;
+  void onReady(Event& event) KJ_NOEXCEPT override;
   PromiseNode* getInnerForTrace() override;
 
 private:
@@ -572,7 +572,7 @@ public:
   EagerPromiseNode(Own<PromiseNode>&& dependency)
       : EagerPromiseNodeBase(kj::mv(dependency), result) {}
 
-  void get(ExceptionOrValue& output) noexcept override {
+  void get(ExceptionOrValue& output) KJ_NOEXCEPT override {
     output.as<T>() = kj::mv(result);
   }
 
@@ -591,7 +591,7 @@ Own<PromiseNode> spark(Own<PromiseNode>&& node) {
 
 class AdapterPromiseNodeBase: public PromiseNode {
 public:
-  void onReady(Event& event) noexcept override;
+  void onReady(Event& event) KJ_NOEXCEPT override;
 
 protected:
   inline void setReady() {
@@ -612,7 +612,7 @@ public:
   AdapterPromiseNode(Params&&... params)
       : adapter(static_cast<PromiseFulfiller<UnfixVoid<T>>&>(*this), kj::fwd<Params>(params)...) {}
 
-  void get(ExceptionOrValue& output) noexcept override {
+  void get(ExceptionOrValue& output) KJ_NOEXCEPT override {
     KJ_IREQUIRE(!isWaiting());
     output.as<T>() = kj::mv(result);
   }
@@ -845,7 +845,7 @@ public:
     wrapper.attach(fulfiller);
   }
 
-  ~PromiseAndFulfillerAdapter() noexcept(false) {
+  ~PromiseAndFulfillerAdapter() KJ_NOEXCEPT_FALSE {
     wrapper.detach(fulfiller);
   }
 

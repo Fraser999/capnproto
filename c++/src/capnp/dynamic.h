@@ -600,8 +600,8 @@ public:
   inline Reader(T&& value): Reader(toDynamic(kj::mv(value))) {}
 
   Reader(const Reader& other);
-  Reader(Reader&& other) noexcept;
-  ~Reader() noexcept(false);
+  Reader(Reader&& other) KJ_NOEXCEPT;
+  ~Reader() KJ_NOEXCEPT_FALSE;
   Reader& operator=(const Reader& other);
   Reader& operator=(Reader&& other);
   // Unfortunately, we cannot use the implicit definitions of these since DynamicCapability is not
@@ -699,8 +699,8 @@ public:
   inline Builder(T value): Builder(toDynamic(value)) {}
 
   Builder(Builder& other);
-  Builder(Builder&& other) noexcept;
-  ~Builder() noexcept(false);
+  Builder(Builder&& other) KJ_NOEXCEPT;
+  ~Builder() KJ_NOEXCEPT_FALSE;
   Builder& operator=(Builder& other);
   Builder& operator=(Builder&& other);
   // Unfortunately, we cannot use the implicit definitions of these since DynamicCapability is not
@@ -750,9 +750,9 @@ public:
   inline Pipeline(DynamicStruct::Pipeline&& value);
   inline Pipeline(DynamicCapability::Client&& value);
 
-  Pipeline(Pipeline&& other) noexcept;
+  Pipeline(Pipeline&& other) KJ_NOEXCEPT;
   Pipeline& operator=(Pipeline&& other);
-  ~Pipeline() noexcept(false);
+  ~Pipeline() KJ_NOEXCEPT_FALSE;
 
   template <typename T>
   inline PipelineFor<T> releaseAs() { return AsImpl<T>::apply(*this); }

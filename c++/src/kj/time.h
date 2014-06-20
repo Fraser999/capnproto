@@ -41,13 +41,13 @@ class DateLabel;
 using Duration = Quantity<int64_t, _::NanosecondLabel>;
 // A time value, in microseconds.
 
-constexpr Duration NANOSECONDS = unit<Duration>();
-constexpr Duration MICROSECONDS = 1000 * NANOSECONDS;
-constexpr Duration MILLISECONDS = 1000 * MICROSECONDS;
-constexpr Duration SECONDS = 1000 * MILLISECONDS;
-constexpr Duration MINUTES = 60 * SECONDS;
-constexpr Duration HOURS = 60 * MINUTES;
-constexpr Duration DAYS = 24 * HOURS;
+KJ_CONSTEXPR Duration NANOSECONDS = unit<Duration>();
+KJ_CONSTEXPR Duration MICROSECONDS = 1000 * NANOSECONDS;
+KJ_CONSTEXPR Duration MILLISECONDS = 1000 * MICROSECONDS;
+KJ_CONSTEXPR Duration SECONDS = 1000 * MILLISECONDS;
+KJ_CONSTEXPR Duration MINUTES = 60 * SECONDS;
+KJ_CONSTEXPR Duration HOURS = 60 * MINUTES;
+KJ_CONSTEXPR Duration DAYS = 24 * HOURS;
 
 using TimePoint = Absolute<Duration, _::TimeLabel>;
 // An absolute time measured by some particular instance of `Timer`.  `Time`s from two different
@@ -56,7 +56,7 @@ using TimePoint = Absolute<Duration, _::TimeLabel>;
 using Date = Absolute<Duration, _::DateLabel>;
 // A point in real-world time, measured relative to the Unix epoch (Jan 1, 1970 00:00:00 UTC).
 
-constexpr Date UNIX_EPOCH = origin<Date>();
+KJ_CONSTEXPR Date UNIX_EPOCH = origin<Date>();
 // The `Date` representing Jan 1, 1970 00:00:00 UTC.
 
 class Timer {

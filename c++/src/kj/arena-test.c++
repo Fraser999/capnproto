@@ -40,7 +40,7 @@ struct TestObject {
     index = -1;
     copiedCount++;
   }
-  ~TestObject() noexcept(false) {
+  ~TestObject() KJ_NOEXCEPT_FALSE {
     if (index == -1) {
       --copiedCount;
     } else {
